@@ -73,8 +73,7 @@ const Library = () => {
     <div>
       <header>
         <img src="/logo.png" alt="Vida Eterna Logo" className="logo-header" />
-        <h1>Vida Eterna</h1>
-        <p class="subtitle">Biblioteca de Estudios Bíblicos Sistemáticos</p>
+        <p className="subtitle">Biblioteca de Estudios Bíblicos Sistemáticos</p>
       </header>
 
       <div className="search-container">
