@@ -1,19 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { db } from '../firebase';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import InstallPrompt from '../components/InstallPrompt';
-
-const CATEGORIES = [
-  { id: 'deidad', name: 'La Deidad y la Persona de Cristo', icon: 'fa-crown' },
-  { id: 'salvacion', name: 'Salvación y Justicia', icon: 'fa-cross' },
-  { id: 'ley', name: 'La Ley y los Dos Pactos', icon: 'fa-scroll' },
-  { id: 'cruz', name: 'Cristo y el Significado de la Cruz', icon: 'fa-cross' },
-  { id: 'profecia', name: 'Profecía y Eventos Finales', icon: 'fa-cloud-sun' },
-  { id: 'vida', name: 'Vida y Crecimiento Cristiano', icon: 'fa-seedling' },
-  { id: 'doctrinas', name: 'Doctrinas y Administración Divina', icon: 'fa-university' },
-  { id: 'reino', name: 'El Reino y el Evangelio', icon: 'fa-crown' }
-];
+import { loadAllStudies } from '../services/studiesService';
+import { CATEGORIES } from '../lib/categories';
+import { getStudyProgress, computeStudyPercent } from '../lib/progress';
 
 const TEMPLATE_STUDIES = [
   // 1. Deidad y Persona de Cristo
@@ -99,6 +89,14 @@ const cleanString = (str) => {
     .replace(/[^a-z0-9]/g, '');      // keeps only alphanumeric
 };
 
+// Mapea IDs de base de datos a IDs de plantilla de la biblioteca
+const ID_MAPPINGS = {
+    'la-divinidad---copia': 'la-divinidad',
+    'sodoma-bestia': 'sodoma-y-la-bestia',
+    'otro-consolador': 'el-espiritu-de-god',
+    'la-identidad-del-hijo': 'el-espiritu-del-anticristo'
+};
+
 const Library = () => {
   const [studies, setStudies] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -106,37 +104,13 @@ const Library = () => {
   const [activeCategory, setActiveCategory] = useState(null); // All closed by default
   const navigate = useNavigate();
 
-  // Maps database IDs to template IDs
-  const ID_MAPPINGS = {
-    'la-divinidad---copia': 'la-divinidad',
-    'sodoma-bestia': 'sodoma-y-la-bestia',
-    'otro-consolador': 'el-espiritu-de-god',
-    'la-identidad-del-hijo': 'el-espiritu-del-anticristo'
-  };
-
   useEffect(() => {
     const loadStudies = async () => {
       let dbStudies = [];
       try {
-        if (db) {
-          const q = query(collection(db, 'studies'), orderBy('title'));
-          const querySnapshot = await getDocs(q);
-          querySnapshot.forEach((doc) => {
-            dbStudies.push({ id: doc.id, ...doc.data() });
-          });
-        }
+        dbStudies = await loadAllStudies();
       } catch (error) {
-        console.error("Error fetching studies from Firestore: ", error);
-      }
-
-      // Load local JSON if Firestore is empty or inactive
-      if (dbStudies.length === 0) {
-        try {
-          const response = await fetch('/studies.json');
-          dbStudies = await response.json();
-        } catch (error) {
-          console.error("Error loading local studies JSON: ", error);
-        }
+        console.error("Error loading studies: ", error);
       }
 
       // Merge Predefined Template with Loaded Studies
@@ -156,9 +130,10 @@ const Library = () => {
           return {
             ...tpl,
             id: dbMatch.id, // Use actual DB id for routing
-            status: 'publicado',
+            status: dbMatch.status || 'publicado',
             title: dbMatch.title || tpl.title,
-            subtitle: dbMatch.subtitle || tpl.subtitle
+            subtitle: dbMatch.subtitle || tpl.subtitle,
+            sections: dbMatch.sections,
           };
         }
         return tpl;
@@ -182,12 +157,13 @@ const Library = () => {
             subtitle: dbS.subtitle || 'Estudio bíblico adicional.',
             icon: dbS.icon || 'fa-book',
             category: dbS.category || 'deidad',
-            status: 'publicado'
+            status: dbS.status || 'publicado',
+            sections: dbS.sections,
           });
         }
       });
 
-      setStudies(mergedList);
+      setStudies(mergedList.filter(s => s.status !== 'borrador'));
       setLoading(false);
     };
 
@@ -300,6 +276,17 @@ const Library = () => {
                               {study.tag}
                             </span>
                           )}
+                          {study.sections && study.sections.length > 0 && (() => {
+                            const pct = computeStudyPercent(study, getStudyProgress(study.id));
+                            return pct > 0 ? (
+                              <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <div style={{ flex: 1, background: 'var(--acento-suave)', height: '6px', borderRadius: '10px', overflow: 'hidden' }}>
+                                  <div style={{ width: `${pct}%`, height: '100%', background: 'var(--oro)' }}></div>
+                                </div>
+                                <span style={{ fontSize: '0.72rem', color: '#888', fontWeight: 'bold' }}>{pct}%</span>
+                              </div>
+                            ) : null;
+                          })()}
                         </div>
                       ))}
                     </div>

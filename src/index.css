@@ -1258,6 +1258,241 @@ footer p {
 }
 
 /* ==========================================================================
+   FLUJO DE ESTUDIO (Portada / Bosquejo / Tema) — Usuario
+   ========================================================================== */
+.study-flow-header {
+  background: var(--azul-real);
+  border-bottom: 3px solid var(--oro);
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.study-flow-header .brand { display: flex; align-items: center; gap: 10px; color: var(--oro); text-decoration: none; }
+.study-flow-header .brand img { height: 34px; }
+.study-flow-header .brand-text { font-family: 'Cinzel', serif; font-size: 1rem; line-height: 1.2; }
+.study-flow-header .brand-text small { display: block; font-size: 0.6rem; letter-spacing: 1px; color: #cfd8e3; }
+.study-flow-header .back-link { color: var(--oro); text-decoration: none; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; }
+.study-flow-header .back-link:hover { color: #fff; }
+
+.study-flow-breadcrumbs {
+  background: var(--crema);
+  padding: 12px 24px;
+  font-size: 0.82rem;
+  color: #8894a8;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #ece3d2;
+}
+.study-flow-breadcrumbs a { color: #8894a8; text-decoration: none; }
+.study-flow-breadcrumbs a:hover { color: var(--azul-real); }
+.study-flow-breadcrumbs .current { color: var(--azul-real); font-weight: bold; }
+
+/* Portada del estudio */
+.cover-hero {
+  background: linear-gradient(135deg, var(--azul-real) 0%, #14264a 100%);
+  border-radius: 16px;
+  padding: 40px;
+  color: #fff;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 36px;
+  align-items: center;
+  margin: 24px auto;
+  max-width: 1100px;
+  border: 2px solid var(--oro);
+}
+.cover-hero-icon {
+  width: 100%; aspect-ratio: 3/4; border-radius: 12px;
+  background: rgba(197,160,89,0.12); border: 1px solid rgba(197,160,89,0.4);
+  display: flex; align-items: center; justify-content: center; font-size: 4rem; color: var(--oro);
+}
+.cover-hero-category { color: var(--oro); font-family: 'Cinzel', serif; font-size: 0.8rem; letter-spacing: 1px; margin-bottom: 10px; }
+.cover-hero h1 { font-family: 'Playfair Display', serif; font-size: 2.4rem; margin-bottom: 8px; }
+.cover-hero .cover-subtitle { font-family: 'Playfair Display', serif; font-style: italic; color: var(--oro); font-size: 1.15rem; margin-bottom: 16px; }
+.cover-hero p.description { color: #d7deea; line-height: 1.7; margin-bottom: 22px; max-width: 640px; }
+.cover-hero-stats { display: flex; gap: 34px; margin-top: 26px; flex-wrap: wrap; }
+.cover-hero-stat { display: flex; align-items: center; gap: 10px; color: #cfd8e3; }
+.cover-hero-stat strong { font-size: 1.3rem; color: #fff; display: block; }
+.cover-hero-stat span.label { font-size: 0.75rem; }
+
+.cover-progress-card {
+  max-width: 1100px; margin: 0 auto 24px; background: #fff; border-radius: 14px;
+  padding: 26px 34px; box-shadow: 0 4px 15px var(--sombra); display: flex; align-items: center; gap: 30px; flex-wrap: wrap;
+}
+.progress-ring { width: 90px; height: 90px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; flex-shrink: 0; }
+.progress-ring-value { font-size: 1.3rem; font-weight: 800; color: var(--azul-real); }
+.progress-ring-inner { width: 68px; height: 68px; border-radius: 50%; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.progress-ring-inner small { font-size: 0.6rem; color: #8894a8; }
+
+.cover-progress-bar-track { flex: 1; min-width: 220px; }
+.cover-progress-bar-track .bar-bg { background: #ece7d8; height: 10px; border-radius: 10px; overflow: hidden; margin-top: 8px; }
+.cover-progress-bar-track .bar-fill { background: linear-gradient(90deg, var(--oro), #d4af37); height: 100%; border-radius: 10px; transition: width 0.4s ease; }
+
+.cover-sections-list { max-width: 1100px; margin: 0 auto 40px; }
+.cover-section-row {
+  display: flex; justify-content: space-between; align-items: center; gap: 14px;
+  background: #fff; border-radius: 10px; padding: 16px 22px; margin-bottom: 10px; box-shadow: 0 2px 8px var(--sombra);
+}
+.cover-section-num { width: 32px; height: 32px; border-radius: 8px; background: var(--azul-real); color: var(--oro); display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; }
+.cover-section-status { font-size: 0.8rem; font-weight: bold; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.cover-section-status.done { color: #1e8a4a; }
+.cover-section-status.progress { color: var(--azul-divino); }
+.cover-section-status.locked { color: #9aa4b5; }
+
+/* Bosquejo */
+.outline-header-card {
+  max-width: 1100px; margin: 24px auto; background: #fff; border-radius: 14px; padding: 26px 32px;
+  box-shadow: 0 4px 15px var(--sombra); display: flex; gap: 22px; align-items: center; flex-wrap: wrap;
+}
+.outline-header-icon { width: 66px; height: 66px; border-radius: 12px; background: var(--azul-real); color: var(--oro); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0; }
+.outline-list { max-width: 1100px; margin: 0 auto 50px; }
+.outline-section { background: #fff; border-radius: 12px; margin-bottom: 16px; overflow: hidden; box-shadow: 0 3px 12px var(--sombra); }
+.outline-section-header {
+  background: var(--azul-real); color: #fff; padding: 16px 24px; display: flex; align-items: center; gap: 16px; cursor: pointer;
+}
+.outline-section-header .num { font-family: 'Cinzel', serif; font-weight: bold; font-size: 1.1rem; color: var(--oro); }
+.outline-section-header .title { flex: 1; font-weight: bold; }
+.outline-section-header .meta { font-size: 0.78rem; color: #cfd8e3; }
+.outline-section-header .pct { font-weight: bold; color: var(--oro); width: 42px; text-align: right; }
+.outline-section-header .bar-bg { width: 100px; background: rgba(255,255,255,0.15); height: 7px; border-radius: 10px; overflow: hidden; }
+.outline-section-header .bar-fill { background: var(--oro); height: 100%; }
+
+.outline-subtopics { padding: 8px 10px; }
+.outline-subtopic-row {
+  display: flex; align-items: center; gap: 16px; padding: 14px 18px; border-radius: 8px; transition: var(--transicion);
+}
+.outline-subtopic-row:hover { background: #fbf8ef; }
+.outline-subtopic-num { font-family: 'Cinzel', serif; color: var(--oro); font-weight: bold; width: 34px; }
+.outline-subtopic-title { font-weight: bold; color: var(--azul-real); }
+.outline-subtopic-refs { font-size: 0.78rem; color: #8894a8; margin-top: 3px; }
+.outline-subtopic-status { font-size: 1.1rem; width: 22px; text-align: center; }
+.outline-subtopic-status.completed { color: #22c55e; }
+.outline-subtopic-status.progress { color: var(--azul-divino); }
+.outline-subtopic-status.pending { color: #cbd2de; }
+
+/* Página de Tema */
+.topic-layout { display: flex; gap: 30px; align-items: flex-start; max-width: 1300px; margin: 0 auto; padding: 24px 20px; }
+.topic-sidebar { width: 280px; flex-shrink: 0; position: sticky; top: 20px; }
+.topic-main { flex: 1; min-width: 0; background: #fff; border-radius: 14px; padding: 40px; box-shadow: 0 8px 25px var(--sombra); border-top: 6px solid var(--oro); }
+.topic-num-badge { display: inline-block; background: var(--oro); color: var(--azul-real); font-family: 'Cinzel', serif; font-weight: bold; padding: 4px 12px; border-radius: 6px; margin-bottom: 10px; }
+.topic-title { font-family: 'Playfair Display', serif; font-size: 1.9rem; color: var(--azul-real); margin-bottom: 26px; }
+
+.topic-nav-buttons { display: flex; justify-content: space-between; gap: 12px; margin-top: 36px; flex-wrap: wrap; }
+.topic-notes-box { margin: 30px 0; background: var(--acento-suave); border-radius: 10px; padding: 20px; }
+.topic-notes-box textarea { width: 100%; border: 1.5px solid #dde2ec; border-radius: 8px; padding: 10px; min-height: 70px; font-family: 'Lora', serif; margin-top: 8px; }
+
+@media (max-width: 1024px) {
+  .cover-hero { grid-template-columns: 1fr; }
+  .cover-hero-icon { max-width: 180px; margin: 0 auto; }
+  .topic-layout { flex-direction: column; }
+  .topic-sidebar { width: 100%; position: static; }
+}
+
+/* ==========================================================================
+   BLOQUES DE ESTUDIO (NUEVO ESQUEMA — Constructor / Página de Tema)
+   ========================================================================== */
+.se-block { margin: 22px 0; }
+
+.se-block-texto { line-height: 1.85; text-align: justify; }
+.se-block-texto h4 { font-family: 'Cinzel', serif; color: var(--azul-real); margin-bottom: 8px; font-size: 1rem; }
+
+.se-block-nota {
+  background: var(--acento-suave);
+  border-left: 6px solid var(--azul-real);
+  border-radius: 0 10px 10px 0;
+  padding: 20px 22px;
+}
+.se-block-nota .se-block-label {
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'Cinzel', serif; font-weight: bold; font-size: 0.8rem;
+  letter-spacing: 0.5px; text-transform: uppercase; color: var(--azul-real);
+  margin-bottom: 8px;
+}
+
+.se-block-destacado {
+  background: linear-gradient(135deg, #fff8e6 0%, #fdefc7 100%);
+  border-left: 6px solid var(--oro);
+  border-radius: 0 10px 10px 0;
+  padding: 20px 22px;
+}
+.se-block-destacado .se-block-label {
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'Cinzel', serif; font-weight: bold; font-size: 0.8rem;
+  letter-spacing: 0.5px; text-transform: uppercase; color: #a47e1f;
+  margin-bottom: 8px;
+}
+
+.se-block-conclusion {
+  background: #f0faf3;
+  border-left: 6px solid var(--verde-ninos);
+  border-radius: 0 10px 10px 0;
+  padding: 20px 22px;
+}
+.se-block-conclusion .se-block-label {
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'Cinzel', serif; font-weight: bold; font-size: 0.8rem;
+  letter-spacing: 0.5px; text-transform: uppercase; color: #1e8a4a;
+  margin-bottom: 8px;
+}
+
+.se-block-separador { border: none; border-top: 2px dashed var(--oro); margin: 35px 0; opacity: 0.6; }
+
+.se-block-accordion { border: 2px solid var(--azul-real); border-radius: 10px; overflow: hidden; }
+.se-block-accordion-header {
+  background: var(--azul-real); color: var(--oro);
+  padding: 16px 22px; cursor: pointer;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: 'Cinzel', serif; font-weight: bold; gap: 12px;
+}
+.se-block-accordion-header:hover { background: #0d1d36; }
+.se-block-accordion-body { padding: 24px; background: #fbfbfb; }
+
+/* Palabra etiquetada dentro de un versículo (clic para ver popover léxico) */
+.word-tag {
+  cursor: pointer;
+  background: rgba(197, 160, 89, 0.18);
+  border-bottom: 2px dotted var(--azul-real);
+  border-radius: 3px;
+  padding: 0 3px;
+  transition: var(--transicion);
+}
+.word-tag:hover { background: rgba(197, 160, 89, 0.35); }
+
+.word-tag-popover {
+  position: fixed;
+  z-index: 3000;
+  width: 320px;
+  max-width: calc(100vw - 30px);
+  background: var(--blanco);
+  border: 2px solid var(--oro);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px var(--sombra-intensa);
+  padding: 16px;
+  animation: scaleUp 0.15s ease;
+}
+.word-tag-popover-header {
+  display: flex; justify-content: space-between; align-items: baseline;
+  border-bottom: 1px solid var(--acento-suave); padding-bottom: 10px; margin-bottom: 10px;
+}
+.word-tag-popover-header strong { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--azul-real); }
+.word-tag-popover-close { background: none; border: none; cursor: pointer; color: #999; font-size: 1rem; }
+.word-tag-popover-tabs { display: flex; gap: 4px; border-bottom: 2px solid var(--acento-suave); margin-bottom: 12px; flex-wrap: wrap; }
+.word-tag-popover-tab {
+  background: none; border: none; cursor: pointer; padding: 6px 8px;
+  font-family: 'Cinzel', serif; font-size: 0.68rem; font-weight: bold;
+  color: #888; border-bottom: 2px solid transparent; margin-bottom: -2px;
+}
+.word-tag-popover-tab.active { color: var(--azul-real); border-bottom-color: var(--oro); }
+.word-tag-popover-content { font-size: 0.88rem; line-height: 1.6; max-height: 260px; overflow-y: auto; }
+.word-tag-popover-content .wt-label { font-family: 'Cinzel', serif; font-size: 0.7rem; color: var(--oro); font-weight: bold; text-transform: uppercase; margin: 10px 0 4px; }
+.word-tag-popover-content .wt-label:first-child { margin-top: 0; }
+
+/* ==========================================================================
    RESPONSIVIDAD Y TRANSICIONES DE PANTALLA
    ========================================================================== */
 

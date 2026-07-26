@@ -1,21 +1,42 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Library from './views/Library';
-import StudyPlayer from './views/StudyPlayer';
+import StudyCover from './views/StudyCover';
+import StudyOutline from './views/StudyOutline';
+import StudyTopic from './views/StudyTopic';
 import AdminLogin from './views/AdminLogin';
-import AdminDashboard from './views/AdminDashboard';
+import AdminLayout from './views/admin/AdminLayout';
+import AdminPanel from './views/admin/AdminPanel';
+import AdminLibrary from './views/admin/AdminLibrary';
+import StudyCreate from './views/admin/StudyCreate';
+import StudyConstructor from './views/admin/StudyConstructor';
+import BlockEditor from './views/admin/BlockEditor';
+import AccordionBuilder from './views/admin/AccordionBuilder';
+import Templates from './views/admin/Templates';
+import Configuracion from './views/admin/Configuracion';
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Public Routes */}
+        {/* Rutas públicas (Usuario) */}
         <Route path="/" element={<Library />} />
-        <Route path="/study/:studyId" element={<StudyPlayer />} />
-        
-        {/* Admin Routes */}
+        <Route path="/study/:studyId" element={<StudyCover />} />
+        <Route path="/study/:studyId/bosquejo" element={<StudyOutline />} />
+        <Route path="/study/:studyId/tema/:sectionId/:subtopicId" element={<StudyTopic />} />
+
+        {/* Rutas de Administrador */}
         <Route path="/login" element={<AdminLogin />} />
-        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminPanel />} />
+          <Route path="estudios" element={<AdminLibrary />} />
+          <Route path="estudios/nuevo" element={<StudyCreate />} />
+          <Route path="estudios/:id/constructor" element={<StudyConstructor />} />
+          <Route path="estudios/:id/constructor/bloque/:blockId" element={<BlockEditor />} />
+          <Route path="estudios/:id/constructor/acordeon/:blockId" element={<AccordionBuilder />} />
+          <Route path="plantillas" element={<Templates />} />
+          <Route path="configuracion" element={<Configuracion />} />
+        </Route>
       </Routes>
     </Router>
   );
