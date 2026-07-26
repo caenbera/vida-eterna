@@ -294,7 +294,7 @@ const StudyConstructor = () => {
                     </span>
                     <div className="constructor-block-body">
                       <div className="constructor-block-title-row">
-                        {blockTitleText(block)}
+                        <span className="constructor-block-title-text">{blockTitleText(block)}</span>
                         <span className="constructor-block-type-tag">{meta.label}</span>
                       </div>
                       <div className="constructor-block-preview">{blockPreviewText(block)}</div>

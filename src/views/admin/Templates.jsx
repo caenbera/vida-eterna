@@ -167,7 +167,7 @@ const Templates = () => {
                       <i className={`fa-solid ${meta.icon}`}></i>
                     </span>
                     <div className="constructor-block-body">
-                      <div className="constructor-block-title-row">{b.title}</div>
+                      <div className="constructor-block-title-row"><span className="constructor-block-title-text">{b.title}</span></div>
                       <div className="constructor-block-preview">{b.description}</div>
                     </div>
                   </div>

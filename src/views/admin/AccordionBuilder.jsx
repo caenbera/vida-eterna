@@ -147,7 +147,7 @@ const AccordionBuilder = () => {
                 </span>
                 <div className="constructor-block-body">
                   <div className="constructor-block-title-row">
-                    {child.title || meta.label}
+                    <span className="constructor-block-title-text">{child.title || meta.label}</span>
                     <span className="constructor-block-type-tag">{meta.label}</span>
                   </div>
                   {'content' in child && (
