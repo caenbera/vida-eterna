@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { loadStudy, saveStudy } from '../../services/studiesService';
 import { BLOCK_TYPES, TRANSLATIONS } from '../../lib/blocks';
@@ -52,24 +52,6 @@ const BlockEditor = () => {
     document.addEventListener('mousedown', handleOutsideClick);
     return () => document.removeEventListener('mousedown', handleOutsideClick);
   }, []);
-
-  // El panel de herramientas es permanente (no un popover que aparece junto a la
-  // selección), así que cualquier re-render mientras el admin selecciona texto
-  // (p. ej. al activarse los tiles) puede hacer que el navegador pierda el
-  // resaltado nativo de la selección aunque el Range siga siendo válido.
-  // Lo volvemos a aplicar explícitamente para que la palabra siga viéndose
-  // seleccionada mientras el panel está activo.
-  useLayoutEffect(() => {
-    if (!selectionRect || !pendingRangeRef.current) return;
-    const sel = window.getSelection();
-    if (!sel) return;
-    try {
-      sel.removeAllRanges();
-      sel.addRange(pendingRangeRef.current);
-    } catch {
-      // El Range quedó inválido (el DOM cambió); no hay nada que restaurar.
-    }
-  }, [selectionRect]);
 
   if (loading || !study || !block) {
     return <div style={{ textAlign: 'center', padding: '60px', color: '#9aa4b5' }}><i className="fa-solid fa-spinner fa-spin"></i> Cargando bloque...</div>;
@@ -275,6 +257,9 @@ const BlockEditor = () => {
                     className="rich-editable"
                     contentEditable
                     suppressContentEditableWarning
+                    data-gramm="false"
+                    data-gramm_editor="false"
+                    data-enable-grammarly="false"
                     dangerouslySetInnerHTML={{ __html: block.text || '' }}
                     onBlur={(e) => { patchBlock({ text: e.currentTarget.innerHTML }); }}
                     onMouseUp={handleEditableSelect}
@@ -301,6 +286,9 @@ const BlockEditor = () => {
                 className="rich-editable"
                 contentEditable
                 suppressContentEditableWarning
+                data-gramm="false"
+                data-gramm_editor="false"
+                data-enable-grammarly="false"
                 dangerouslySetInnerHTML={{ __html: block.content || '' }}
                 onBlur={(e) => patchBlock({ content: e.currentTarget.innerHTML })}
               />
