@@ -25,6 +25,21 @@ const AnnotationFieldsReadOnly = ({ kind, dataset }) => {
         if (isListField(field)) {
           const rows = readListField(dataset, field, legacyFieldFor(field));
           if (!rows.length) return null;
+          if (field === 'translations') {
+            return (
+              <div key={field} style={{ marginBottom: '8px' }}>
+                <div className="wt-label">{FIELD_LABELS[field]}</div>
+                <div className="annotation-translation-list">
+                  {rows.map((row, i) => (
+                    <div key={i} className="annotation-translation-row">
+                      <span className="annotation-translation-code">{row.translation}</span>
+                      <p style={{ whiteSpace: 'pre-line', margin: 0 }}>{row.text}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          }
           return (
             <div key={field} style={{ marginBottom: '8px' }}>
               <div className="wt-label">{FIELD_LABELS[field]}</div>

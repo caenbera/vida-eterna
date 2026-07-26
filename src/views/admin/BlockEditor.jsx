@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { loadStudy, saveStudy } from '../../services/studiesService';
-import { BLOCK_TYPES } from '../../lib/blocks';
+import { BLOCK_TYPES, TRANSLATIONS } from '../../lib/blocks';
 import { ANNOTATION_KINDS, applyAnnotationStyle } from '../../lib/annotationKinds';
 import { placeCards } from '../../lib/annotationLayout';
 import { AdminBreadcrumbs } from './AdminLayout';
@@ -10,7 +10,6 @@ import ToolsPanel from '../../components/admin/ToolsPanel';
 import AnnotationCard from '../../components/admin/AnnotationCard';
 import ConnectorOverlay from '../../components/annotations/ConnectorOverlay';
 
-const TRANSLATIONS = ['RVR60', 'RVR95', 'NVI', 'LBLA', 'NTV'];
 const CARD_WIDTH = 320;
 const CARD_HEIGHT_ESTIMATE = 220;
 

@@ -1,9 +1,10 @@
 // Herramientas de anotación de palabras/frases dentro de un bloque de versículo.
-// "Diccionario" se fusiona como un campo opcional dentro de Palabra clave / Léxico.
 // "Conectar" se fusiona dentro de "Referencia cruzada" (referencia): en vez de un
 // textarea libre, guarda filas { category, reference } con categorías tipo
-// Paralelo/Contexto/Profecía. "Comparar" queda fuera de alcance por ahora: requiere
-// datos de múltiples traducciones, que no tenemos todavía.
+// Paralelo/Contexto/Profecía. "Comparar" guarda filas { translation, text } con el
+// texto de cada traducción escrito a mano por el admin (sin API bíblica).
+// "Diccionario" es un subconjunto de campos de Palabra clave / Léxico, sin "otras
+// apariciones" (eso sigue siendo exclusivo de léxico).
 
 export const ANNOTATION_COLORS = [
   { id: 'amarillo', hex: '#f1c40f' },
@@ -26,6 +27,8 @@ export const ANNOTATION_KINDS = {
   etiqueta: { id: 'etiqueta', label: 'Etiqueta', icon: 'fa-tag', color: '#22c55e', fields: ['tag'] },
   lexico: { id: 'lexico', label: 'Palabra clave / Léxico', icon: 'fa-language', color: '#0a192f', fields: ['hebrew', 'translit', 'strong', 'meaning', 'other', 'dicturl'] },
   pregunta: { id: 'pregunta', label: 'Pregunta', icon: 'fa-circle-question', color: '#c026d3', fields: ['question'] },
+  comparar: { id: 'comparar', label: 'Comparar traducciones', icon: 'fa-code-compare', color: '#0891b2', fields: ['translations'], listFields: ['translations'] },
+  diccionario: { id: 'diccionario', label: 'Diccionario', icon: 'fa-book', color: '#7c3aed', fields: ['hebrew', 'translit', 'strong', 'meaning', 'dicturl'] },
 };
 
 export const ANNOTATION_KIND_LIST = Object.values(ANNOTATION_KINDS);
@@ -75,4 +78,5 @@ export const FIELD_LABELS = {
   other: 'Otras apariciones (una por línea)',
   dicturl: 'Enlace a diccionario (opcional)',
   question: 'Pregunta de reflexión',
+  translations: 'Traducciones comparadas',
 };

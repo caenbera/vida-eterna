@@ -1,6 +1,8 @@
 // Esquema compartido de bloques y estructura de estudio (Estudio -> Secciones -> Subtemas -> Bloques).
 // Usado tanto por el Constructor de administrador como por el renderizador de usuario.
 
+export const TRANSLATIONS = ['RVR60', 'RVR95', 'NVI', 'LBLA', 'NTV'];
+
 let idCounter = 0;
 export function generateId(prefix = 'id') {
   idCounter += 1;

@@ -318,6 +318,27 @@
 .annotation-link-row-remove { background: none; border: none; color: #9aa4b5; cursor: pointer; padding: 6px; border-radius: 6px; }
 .annotation-link-row-remove:hover { background: #eef0f5; color: #e74c3c; }
 
+/* Buscador de léxico Strong's (autocompletado de hebreo/griego/transliteración/significado) */
+.annotation-lexicon-search { position: relative; }
+.annotation-lexicon-results {
+  list-style: none; margin: 4px 0 0; padding: 4px; max-height: 220px; overflow-y: auto;
+  border: 1.5px solid #dde2ec; border-radius: 8px; background: #fff;
+  box-shadow: 0 10px 24px rgba(20,30,60,0.12);
+}
+.annotation-lexicon-results li + li { border-top: 1px solid #f0f2f7; }
+.annotation-lexicon-results button {
+  width: 100%; text-align: left; background: none; border: none; cursor: pointer;
+  padding: 8px 6px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; border-radius: 6px;
+}
+.annotation-lexicon-results button:hover { background: #f4f6fb; }
+.annotation-lexicon-translit { color: #6b7688; font-style: italic; font-size: 0.8rem; }
+.annotation-lexicon-strong { font-family: 'Cinzel', serif; font-size: 0.68rem; color: var(--oro); font-weight: bold; }
+.annotation-lexicon-meaning { flex-basis: 100%; font-size: 0.78rem; color: #8894a8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Editor de filas para comparar traducciones (traducción + texto libre) */
+.annotation-translation-edit-row { display: flex; flex-direction: column; gap: 6px; padding-bottom: 8px; border-bottom: 1px dashed #eceff5; margin-bottom: 4px; }
+.annotation-translation-edit-row:last-of-type { border-bottom: none; }
+
 .admin-empty-state { text-align: center; padding: 60px 20px; color: #9aa4b5; }
 .admin-empty-state i { font-size: 2.2rem; margin-bottom: 14px; color: #d5dae5; }
 
