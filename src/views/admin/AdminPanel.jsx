@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loadAllStudies, loadAllTemplates } from '../../services/studiesService';
+import { loadAllStudies, loadAllTemplates, saveStudy, isFirestoreEnabled } from '../../services/studiesService';
 import { CATEGORIES } from '../../lib/categories';
 import { countVerses, countReferences } from '../../lib/blocks';
 
@@ -21,15 +21,39 @@ const AdminPanel = () => {
   const [studies, setStudies] = useState([]);
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [migrating, setMigrating] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      const [s, t] = await Promise.all([loadAllStudies(), loadAllTemplates()]);
-      setStudies(s);
-      setTemplates(t);
-      setLoading(false);
-    })();
-  }, []);
+  const refresh = async () => {
+    const [s, t] = await Promise.all([loadAllStudies(), loadAllTemplates()]);
+    setStudies(s);
+    setTemplates(t);
+    setLoading(false);
+  };
+
+  useEffect(() => { refresh(); }, []);
+
+  // Migración única al conectar Firebase por primera vez: sube lo que ya estaba
+  // guardado en el localStorage de este navegador (o el seed de studies.json si
+  // no había nada) hacia Firestore, para no perder estudios ya editados.
+  const handleMigrate = async () => {
+    if (!window.confirm('Esto copiará los estudios de este navegador (o los de ejemplo) hacia Firebase. ¿Continuar?')) return;
+    setMigrating(true);
+    try {
+      const raw = localStorage.getItem('vida_eterna_local_studies_v2');
+      const cached = raw ? JSON.parse(raw) : null;
+      const source = cached && cached.length ? cached : await (await fetch('/studies.json')).json();
+      for (const s of source) {
+        await saveStudy(s);
+      }
+      await refresh();
+      window.alert(`Migración completa: ${source.length} estudio(s) subidos a Firebase.`);
+    } catch (err) {
+      console.error('Error migrando a Firebase:', err);
+      window.alert('Error durante la migración: ' + err.message);
+    } finally {
+      setMigrating(false);
+    }
+  };
 
   const published = studies.filter((s) => s.status === 'publicado').length;
   const totalVerses = studies.reduce((acc, s) => acc + countVerses(s), 0);
@@ -58,6 +82,24 @@ const AdminPanel = () => {
           <i className="fa-solid fa-plus"></i> Crear nuevo estudio
         </button>
       </div>
+
+      {!loading && isFirestoreEnabled() && studies.length === 0 && (
+        <div className="admin-card" style={{ marginBottom: '20px', borderLeft: '4px solid var(--oro)' }}>
+          <div style={{ fontWeight: 'bold', marginBottom: '6px' }}>
+            <i className="fa-solid fa-cloud-arrow-up"></i> Firebase está conectado pero aún no tiene estudios
+          </div>
+          <p style={{ fontSize: '0.85rem', color: '#6b7688', marginBottom: '12px' }}>
+            Sube los estudios que ya tenías guardados en este navegador (o los de ejemplo) a Firebase, para que todos los visitantes los vean.
+          </p>
+          <button className="btn-outline" onClick={handleMigrate} disabled={migrating}>
+            {migrating ? (
+              <><i className="fa-solid fa-spinner fa-spin"></i> Migrando...</>
+            ) : (
+              <><i className="fa-solid fa-cloud-arrow-up"></i> Migrar estudios a Firebase</>
+            )}
+          </button>
+        </div>
+      )}
 
       {loading ? (
         <div style={{ textAlign: 'center', padding: '60px', color: '#9aa4b5' }}>

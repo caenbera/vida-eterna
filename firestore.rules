@@ -1,0 +1,16 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Los estudios son de lectura pública (los ve cualquier visitante del sitio),
+    // pero solo el admin autenticado (Firebase Auth) puede crear/editar/borrar.
+    match /studies/{studyId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Las plantillas solo se usan dentro del panel de administración.
+    match /templates/{templateId} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
