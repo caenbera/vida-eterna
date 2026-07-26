@@ -39,10 +39,6 @@ const BlockEditor = () => {
     })();
   }, [id, blockId, sectionId, subtopicId, navigate]);
 
-  if (loading || !study || !block) {
-    return <div style={{ textAlign: 'center', padding: '60px', color: '#9aa4b5' }}><i className="fa-solid fa-spinner fa-spin"></i> Cargando bloque...</div>;
-  }
-
   useEffect(() => {
     const handleOutsideClick = (e) => {
       if (e.target.closest('.selection-toolbar') || e.target.closest('.color-swatch-popover')) return;
@@ -52,6 +48,10 @@ const BlockEditor = () => {
     document.addEventListener('mousedown', handleOutsideClick);
     return () => document.removeEventListener('mousedown', handleOutsideClick);
   }, []);
+
+  if (loading || !study || !block) {
+    return <div style={{ textAlign: 'center', padding: '60px', color: '#9aa4b5' }}><i className="fa-solid fa-spinner fa-spin"></i> Cargando bloque...</div>;
+  }
 
   const meta = BLOCK_TYPES[block.type] || {};
 
