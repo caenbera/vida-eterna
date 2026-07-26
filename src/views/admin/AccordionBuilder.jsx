@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { loadStudy, saveStudy } from '../../services/studiesService';
-import { createBlock, BLOCK_TYPE_LIST, BLOCK_TYPES, ACCORDION_COLORS } from '../../lib/blocks';
+import { createBlock, BLOCK_TYPE_LIST, BLOCK_TYPES, ACCORDION_COLORS, sanitizeStudy } from '../../lib/blocks';
 import { AdminBreadcrumbs } from './AdminLayout';
 import BlockRenderer from '../../components/blocks/BlockRenderer';
 
@@ -21,7 +21,7 @@ const AccordionBuilder = () => {
 
   useEffect(() => {
     (async () => {
-      const s = await loadStudy(id);
+      const s = sanitizeStudy(await loadStudy(id));
       if (!s) { navigate('/admin/estudios'); return; }
       const section = s.sections.find((sec) => sec.id === sectionId);
       const subtopic = section?.subtopics.find((st) => st.id === subtopicId);

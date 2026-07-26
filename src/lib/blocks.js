@@ -215,3 +215,20 @@ export function findSubtopic(study, sectionId, subtopicId) {
 export function progressKey(sectionId, subtopicId) {
   return `${sectionId}__${subtopicId}`;
 }
+
+// Quita entradas nulas/indefinidas de sections/subtopics/blocks. Estudios guardados
+// antes de corregir un bug de arrastrar-y-soltar podían terminar con un bloque
+// "undefined" insertado en el arreglo, lo que rompe cualquier .find(b => b.id).
+export function sanitizeStudy(study) {
+  if (!study) return study;
+  return {
+    ...study,
+    sections: (study.sections || []).filter(Boolean).map((sec) => ({
+      ...sec,
+      subtopics: (sec.subtopics || []).filter(Boolean).map((st) => ({
+        ...st,
+        blocks: (st.blocks || []).filter(Boolean),
+      })),
+    })),
+  };
+}

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { loadStudy, saveStudy } from '../../services/studiesService';
-import { BLOCK_TYPES, TRANSLATIONS } from '../../lib/blocks';
+import { BLOCK_TYPES, TRANSLATIONS, sanitizeStudy } from '../../lib/blocks';
 import { ANNOTATION_KINDS, applyAnnotationStyle } from '../../lib/annotationKinds';
 import { placeCards } from '../../lib/annotationLayout';
 import { AdminBreadcrumbs } from './AdminLayout';
@@ -31,7 +31,7 @@ const BlockEditor = () => {
 
   useEffect(() => {
     (async () => {
-      const s = await loadStudy(id);
+      const s = sanitizeStudy(await loadStudy(id));
       if (!s) { navigate('/admin/estudios'); return; }
       const section = s.sections.find((sec) => sec.id === sectionId);
       const subtopic = section?.subtopics.find((st) => st.id === subtopicId);

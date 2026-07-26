@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { loadStudy, saveStudy } from '../../services/studiesService';
-import { createBlock, createSection, createSubtopic, BLOCK_TYPE_LIST, BLOCK_TYPES } from '../../lib/blocks';
+import { createBlock, createSection, createSubtopic, BLOCK_TYPE_LIST, BLOCK_TYPES, sanitizeStudy } from '../../lib/blocks';
 import { AdminBreadcrumbs } from './AdminLayout';
 
 const blockPreviewText = (block) => {
@@ -29,7 +29,7 @@ const StudyConstructor = () => {
 
   useEffect(() => {
     (async () => {
-      const s = await loadStudy(id);
+      const s = sanitizeStudy(await loadStudy(id));
       if (!s) { navigate('/admin/estudios'); return; }
       setStudy(s);
       if (s.sections?.[0]) {
@@ -152,7 +152,9 @@ const StudyConstructor = () => {
     if (dragIndex.current === null || dragIndex.current === targetIdx) return;
     updateSections((sections) =>
       withActiveBlocks(sections, (st) => {
+        if (dragIndex.current < 0 || dragIndex.current >= st.blocks.length) return;
         const [moved] = st.blocks.splice(dragIndex.current, 1);
+        if (!moved) return;
         st.blocks.splice(targetIdx, 0, moved);
       })
     );
