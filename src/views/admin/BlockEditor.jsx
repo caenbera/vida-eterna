@@ -2,8 +2,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { loadStudy, saveStudy } from '../../services/studiesService';
 import { BLOCK_TYPES } from '../../lib/blocks';
+import { ANNOTATION_KINDS, applyAnnotationStyle } from '../../lib/annotationKinds';
 import { AdminBreadcrumbs } from './AdminLayout';
 import RichTextToolbar from '../../components/admin/RichTextToolbar';
+import SelectionToolbar from '../../components/admin/SelectionToolbar';
+import AnnotationCard from '../../components/admin/AnnotationCard';
 
 const TRANSLATIONS = ['RVR60', 'RVR95', 'NVI', 'LBLA', 'NTV'];
 
@@ -17,8 +20,10 @@ const BlockEditor = () => {
   const [study, setStudy] = useState(null);
   const [block, setBlock] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [wordForm, setWordForm] = useState(null);
+  const [selectionRect, setSelectionRect] = useState(null);
+  const [cards, setCards] = useState([]);
   const textRef = useRef(null);
+  const pendingRangeRef = useRef(null);
 
   useEffect(() => {
     (async () => {
@@ -37,6 +42,16 @@ const BlockEditor = () => {
   if (loading || !study || !block) {
     return <div style={{ textAlign: 'center', padding: '60px', color: '#9aa4b5' }}><i className="fa-solid fa-spinner fa-spin"></i> Cargando bloque...</div>;
   }
+
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (e.target.closest('.selection-toolbar') || e.target.closest('.color-swatch-popover')) return;
+      if (textRef.current && textRef.current.contains(e.target)) return;
+      setSelectionRect(null);
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
 
   const meta = BLOCK_TYPES[block.type] || {};
 
@@ -58,50 +73,109 @@ const BlockEditor = () => {
     if (andClose) navigate(`/admin/estudios/${id}/constructor`);
   };
 
-  const handleTagSelection = () => {
+  const syncTextFromDom = () => patchBlock({ text: textRef.current.innerHTML });
+
+  // ---- Selección de texto dentro del versículo -> barra flotante ----
+  const handleEditableSelect = () => {
     const sel = window.getSelection();
     if (!sel || sel.isCollapsed || !textRef.current || !textRef.current.contains(sel.anchorNode)) {
-      window.alert('Selecciona primero una palabra o frase dentro del texto del versículo.');
+      setSelectionRect(null);
       return;
     }
     const range = sel.getRangeAt(0);
-    const word = sel.toString();
-    const tempId = `wtag_${Date.now()}`;
+    pendingRangeRef.current = range.cloneRange();
+    setSelectionRect(range.getBoundingClientRect());
+  };
 
-    // Insertamos el span inmediatamente (mientras el Range todavía es válido) y lo
-    // referenciamos luego por id. Esperar a que el admin llene el formulario del modal
-    // antes de mutar el DOM deja el Range obsoleto tras los re-renders de React.
+  const wrapPendingSelection = (kindId, extraData = {}) => {
+    const range = pendingRangeRef.current;
+    if (!range || range.collapsed) return null;
     const span = document.createElement('span');
+    const spanId = `wtag_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
     span.className = 'word-tag';
-    span.id = tempId;
-    span.textContent = word;
+    span.id = spanId;
+    span.dataset.kind = kindId;
+    Object.entries(extraData).forEach(([k, v]) => { if (v) span.dataset[k] = v; });
+    span.textContent = range.toString();
+    applyAnnotationStyle(span, kindId, extraData.color);
     range.deleteContents();
     range.insertNode(span);
-    sel.removeAllRanges();
-
-    patchBlock({ text: textRef.current.innerHTML });
-    setWordForm({ tempId, word, hebrew: '', translit: '', strong: '', meaning: '', note: '', refs: '', other: '' });
+    window.getSelection()?.removeAllRanges();
+    pendingRangeRef.current = null;
+    syncTextFromDom();
+    return spanId;
   };
 
-  const applyWordTag = () => {
-    const { tempId, ...rest } = wordForm;
-    const span = textRef.current?.querySelector(`#${tempId}`);
+  // Herramientas instantáneas: resaltar / subrayar / encerrar (eligen color y aplican de una vez)
+  const handlePickInstant = (kindId, colorHex) => {
+    wrapPendingSelection(kindId, { color: colorHex });
+    setSelectionRect(null);
+  };
+
+  // Herramientas con formulario: nota / referencia / etiqueta / léxico / pregunta
+  const handlePickForm = (kindId) => {
+    const spanId = wrapPendingSelection(kindId, {});
+    setSelectionRect(null);
+    if (!spanId) return;
+    const span = textRef.current.querySelector(`#${spanId}`);
+    if (!span) return;
+    openCard({ cardId: spanId, kindId, mode: 'edit', isNew: true, rect: span.getBoundingClientRect(), data: {} });
+  };
+
+  const openCard = (card) => {
+    setCards((prev) => [...prev.filter((c) => c.cardId !== card.cardId), card]);
+  };
+
+  const handleEditableClick = (e) => {
+    const sel = window.getSelection();
+    if (sel && !sel.isCollapsed) return; // fue un drag de selección, no un clic simple
+    const tag = e.target.closest('.word-tag');
+    if (!tag || !textRef.current.contains(tag)) return;
+    if (!tag.id) tag.id = `wtag_${Date.now()}`;
+    const kindId = tag.dataset.kind || 'lexico';
+    openCard({
+      cardId: tag.id,
+      kindId,
+      mode: 'view',
+      isNew: false,
+      rect: tag.getBoundingClientRect(),
+      data: { ...tag.dataset },
+    });
+  };
+
+  const handleStartEdit = (cardId) => {
+    setCards((prev) => prev.map((c) => (c.cardId === cardId ? { ...c, mode: 'edit' } : c)));
+  };
+
+  const handleSaveCard = (cardId, fields) => {
+    const span = textRef.current.querySelector(`#${cardId}`);
     if (span) {
-      span.removeAttribute('id');
-      Object.entries(rest).forEach(([k, v]) => { if (v && k !== 'word') span.dataset[k] = v; });
-      patchBlock({ text: textRef.current.innerHTML });
+      Object.keys(fields).forEach((k) => {
+        if (k === 'color' || k === 'kind') return;
+        if (fields[k]) span.dataset[k] = fields[k];
+        else delete span.dataset[k];
+      });
+      syncTextFromDom();
     }
-    setWordForm(null);
+    setCards((prev) => prev.filter((c) => c.cardId !== cardId));
   };
 
-  const cancelWordTag = () => {
-    const span = wordForm?.tempId && textRef.current?.querySelector(`#${wordForm.tempId}`);
+  const handleDeleteCard = (cardId) => {
+    const span = textRef.current.querySelector(`#${cardId}`);
     if (span) {
       span.replaceWith(document.createTextNode(span.textContent));
       textRef.current.normalize();
-      patchBlock({ text: textRef.current.innerHTML });
+      syncTextFromDom();
     }
-    setWordForm(null);
+    setCards((prev) => prev.filter((c) => c.cardId !== cardId));
+  };
+
+  const handleCloseCard = (cardId, discardIfNew) => {
+    if (discardIfNew) {
+      handleDeleteCard(cardId);
+      return;
+    }
+    setCards((prev) => prev.filter((c) => c.cardId !== cardId));
   };
 
   return (
@@ -158,22 +232,30 @@ const BlockEditor = () => {
 
               <div className="form-group">
                 <label>Contenido del versículo</label>
-                <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-                  <button type="button" className="btn-outline" onClick={handleTagSelection} style={{ fontSize: '0.78rem', padding: '7px 12px' }}>
-                    <i className="fa-solid fa-tag"></i> Etiquetar palabra seleccionada
-                  </button>
+                <div className="annotation-legend">
+                  {Object.values(ANNOTATION_KINDS).map((k) => (
+                    <span key={k.id} title={k.label}><i className={`fa-solid ${k.icon}`} style={{ color: k.color }}></i> {k.label}</span>
+                  ))}
                 </div>
-                <RichTextToolbar targetRef={textRef} onChanged={(html) => patchBlock({ text: html })} />
-                <div
-                  ref={textRef}
-                  className="rich-editable"
-                  contentEditable
-                  suppressContentEditableWarning
-                  dangerouslySetInnerHTML={{ __html: block.text || '' }}
-                  onBlur={(e) => patchBlock({ text: e.currentTarget.innerHTML })}
-                />
-                <div style={{ fontSize: '0.75rem', color: '#9aa4b5', marginTop: '6px' }}>
-                  Selecciona una palabra dentro del texto y pulsa "Etiquetar palabra" para añadirle hebreo/griego, Strong's, nota y referencias.
+                <div style={{ fontSize: '0.75rem', color: '#9aa4b5', margin: '4px 0 8px' }}>
+                  Selecciona una palabra o frase del texto para ver las herramientas de anotación.
+                </div>
+                <div style={{ position: 'relative' }}>
+                  <RichTextToolbar targetRef={textRef} onChanged={(html) => patchBlock({ text: html })} />
+                  <div
+                    ref={textRef}
+                    className="rich-editable"
+                    contentEditable
+                    suppressContentEditableWarning
+                    dangerouslySetInnerHTML={{ __html: block.text || '' }}
+                    onBlur={(e) => { patchBlock({ text: e.currentTarget.innerHTML }); }}
+                    onMouseUp={handleEditableSelect}
+                    onKeyUp={handleEditableSelect}
+                    onClick={handleEditableClick}
+                  />
+                  {selectionRect && (
+                    <SelectionToolbar rect={selectionRect} onPickInstant={handlePickInstant} onPickForm={handlePickForm} />
+                  )}
                 </div>
               </div>
 
@@ -259,47 +341,16 @@ const BlockEditor = () => {
         </div>
       </div>
 
-      {wordForm && (
-        <div className="modal" onClick={cancelWordTag}>
-          <div className="modal-content" style={{ maxWidth: '500px' }} onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">Etiquetar palabra: "{wordForm.word}"</div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-              <div className="form-group">
-                <label>Hebreo / Griego</label>
-                <input className="admin-input" value={wordForm.hebrew} onChange={(e) => setWordForm({ ...wordForm, hebrew: e.target.value })} placeholder="ראשית" />
-              </div>
-              <div className="form-group">
-                <label>Transliteración</label>
-                <input className="admin-input" value={wordForm.translit} onChange={(e) => setWordForm({ ...wordForm, translit: e.target.value })} placeholder="reshit" />
-              </div>
-            </div>
-            <div className="form-group">
-              <label>Número de Strong</label>
-              <input className="admin-input" value={wordForm.strong} onChange={(e) => setWordForm({ ...wordForm, strong: e.target.value })} placeholder="H7225" />
-            </div>
-            <div className="form-group">
-              <label>Significado</label>
-              <input className="admin-input" value={wordForm.meaning} onChange={(e) => setWordForm({ ...wordForm, meaning: e.target.value })} placeholder="Principio, primero, cabeza..." />
-            </div>
-            <div className="form-group">
-              <label>Nota del estudio</label>
-              <textarea className="admin-textarea" value={wordForm.note} onChange={(e) => setWordForm({ ...wordForm, note: e.target.value })} />
-            </div>
-            <div className="form-group">
-              <label>Referencias relacionadas (separadas por ;)</label>
-              <input className="admin-input" value={wordForm.refs} onChange={(e) => setWordForm({ ...wordForm, refs: e.target.value })} placeholder="Juan 1:14; Hebreos 1:5" />
-            </div>
-            <div className="form-group">
-              <label>Otras apariciones (separadas por ;)</label>
-              <input className="admin-input" value={wordForm.other} onChange={(e) => setWordForm({ ...wordForm, other: e.target.value })} placeholder="Salmo 2:7; Juan 3:16" />
-            </div>
-            <div className="modal-buttons">
-              <button className="modal-btn modal-close" onClick={cancelWordTag}>Cancelar</button>
-              <button className="modal-btn modal-save" onClick={applyWordTag}>Aplicar etiqueta</button>
-            </div>
-          </div>
-        </div>
-      )}
+      {cards.map((card) => (
+        <AnnotationCard
+          key={card.cardId}
+          card={card}
+          onSave={handleSaveCard}
+          onDelete={handleDeleteCard}
+          onClose={handleCloseCard}
+          onStartEdit={handleStartEdit}
+        />
+      ))}
     </div>
   );
 };

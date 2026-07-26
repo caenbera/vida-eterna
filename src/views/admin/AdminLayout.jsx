@@ -14,6 +14,15 @@ const NAV_ITEMS = [
 const AdminLayout = () => {
   const navigate = useNavigate();
   const [checkedAuth, setCheckedAuth] = useState(false);
+  const [collapsed, setCollapsed] = useState(() => localStorage.getItem('vida_eterna_admin_sidebar_collapsed') === 'true');
+
+  const toggleCollapsed = () => {
+    setCollapsed((prev) => {
+      const next = !prev;
+      localStorage.setItem('vida_eterna_admin_sidebar_collapsed', String(next));
+      return next;
+    });
+  };
 
   useEffect(() => {
     if (auth) {
@@ -44,47 +53,56 @@ const AdminLayout = () => {
   }
 
   return (
-    <div className="admin-shell">
+    <div className={`admin-shell ${collapsed ? 'sidebar-collapsed' : ''}`}>
       <aside className="admin-sidebar">
+        <button className="admin-sidebar-collapse-btn" onClick={toggleCollapsed} title={collapsed ? 'Expandir menú' : 'Colapsar menú'}>
+          <i className={`fa-solid ${collapsed ? 'fa-angles-right' : 'fa-angles-left'}`}></i>
+        </button>
+
         <div className="admin-sidebar-logo">
           <img src={logo} alt="Vida Eterna" />
-          <div>
-            <div className="brand-title">Vida Eterna</div>
-            <div className="brand-sub">ESTUDIOS BÍBLICOS</div>
-          </div>
+          {!collapsed && (
+            <div>
+              <div className="brand-title">Vida Eterna</div>
+              <div className="brand-sub">ESTUDIOS BÍBLICOS</div>
+            </div>
+          )}
         </div>
 
-        <div className="admin-nav-group-label">ADMINISTRACIÓN</div>
+        {!collapsed && <div className="admin-nav-group-label">ADMINISTRACIÓN</div>}
         {NAV_ITEMS.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
             end={item.end}
+            title={item.label}
             className={({ isActive }) => `admin-nav-link${isActive ? ' active' : ''}`}
           >
             <i className={`fa-solid ${item.icon}`}></i>
-            {item.label}
+            {!collapsed && item.label}
           </NavLink>
         ))}
 
         <div className="admin-sidebar-footer">
-          <button className="admin-nav-link" onClick={() => navigate('/')}>
+          <button className="admin-nav-link" onClick={() => navigate('/')} title="Ir a la web">
             <i className="fa-solid fa-arrow-up-right-from-square"></i>
-            Ir a la web
+            {!collapsed && 'Ir a la web'}
           </button>
           <div className="admin-sidebar-user">
-            <div className="avatar">
+            <div className="avatar" onClick={collapsed ? handleLogout : undefined} title={collapsed ? 'Cerrar sesión' : undefined} style={collapsed ? { cursor: 'pointer' } : undefined}>
               <i className="fa-solid fa-user"></i>
             </div>
-            <div style={{ flex: 1 }}>
-              <div>Administrador</div>
-              <button
-                onClick={handleLogout}
-                style={{ background: 'none', border: 'none', color: '#9fb0c8', fontSize: '0.75rem', cursor: 'pointer', padding: 0 }}
-              >
-                Cerrar sesión
-              </button>
-            </div>
+            {!collapsed && (
+              <div style={{ flex: 1 }}>
+                <div>Administrador</div>
+                <button
+                  onClick={handleLogout}
+                  style={{ background: 'none', border: 'none', color: '#9fb0c8', fontSize: '0.75rem', cursor: 'pointer', padding: 0 }}
+                >
+                  Cerrar sesión
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </aside>
