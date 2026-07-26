@@ -1463,34 +1463,44 @@ footer p {
 }
 .word-tag:hover { background: rgba(197, 160, 89, 0.35); }
 
-.word-tag-popover {
+/* Tarjeta de anotación (marco compartido entre el editor de admin y el sitio
+   público) y la línea conectora punteada que la une a la palabra anotada. */
+.annotation-card {
   position: fixed;
-  z-index: 3000;
+  z-index: 2600;
   width: 320px;
-  max-width: calc(100vw - 30px);
+  max-width: calc(100vw - 20px);
   background: var(--blanco);
-  border: 2px solid var(--oro);
-  border-radius: 10px;
-  box-shadow: 0 10px 30px var(--sombra-intensa);
-  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 14px 34px rgba(20,30,60,0.22);
+  border: 1px solid #eceff5;
+  overflow: hidden;
   animation: scaleUp 0.15s ease;
 }
-.word-tag-popover-header {
-  display: flex; justify-content: space-between; align-items: baseline;
-  border-bottom: 1px solid var(--acento-suave); padding-bottom: 10px; margin-bottom: 10px;
+.annotation-card-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 14px; border-left: 5px solid var(--oro); background: #fafbfd; border-bottom: 1px solid #eef0f5;
 }
-.word-tag-popover-header strong { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--azul-real); }
-.word-tag-popover-close { background: none; border: none; cursor: pointer; color: #999; font-size: 1rem; }
-.word-tag-popover-tabs { display: flex; gap: 4px; border-bottom: 2px solid var(--acento-suave); margin-bottom: 12px; flex-wrap: wrap; }
-.word-tag-popover-tab {
-  background: none; border: none; cursor: pointer; padding: 6px 8px;
-  font-family: 'Cinzel', serif; font-size: 0.68rem; font-weight: bold;
-  color: #888; border-bottom: 2px solid transparent; margin-bottom: -2px;
+.annotation-card-header-title { font-family: 'Cinzel', serif; font-size: 0.72rem; font-weight: bold; letter-spacing: 0.5px; color: var(--azul-real); display: flex; align-items: center; gap: 8px; }
+.annotation-card-header-actions { display: flex; gap: 2px; }
+.annotation-card-header-actions button { background: none; border: none; color: #9aa4b5; cursor: pointer; padding: 6px; border-radius: 6px; font-size: 0.8rem; }
+.annotation-card-header-actions button:hover { background: #eef0f5; color: var(--azul-real); }
+.annotation-card-body { padding: 14px; font-size: 0.85rem; line-height: 1.6; max-height: 360px; overflow-y: auto; }
+
+.wt-label { font-family: 'Cinzel', serif; font-size: 0.7rem; color: var(--oro); font-weight: bold; text-transform: uppercase; margin: 10px 0 4px; }
+.wt-label:first-child { margin-top: 0; }
+
+.annotation-link-list { list-style: none; padding: 0; margin: 4px 0 0; }
+.annotation-link-list li { padding: 4px 0; border-bottom: 1px dashed #eceff5; font-size: 0.85rem; }
+.annotation-link-list li:last-child { border-bottom: none; }
+.annotation-link-list i { color: #9aa4b5; margin: 0 4px; font-size: 0.75rem; }
+
+.annotation-connector-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  pointer-events: none;
+  z-index: 2550;
 }
-.word-tag-popover-tab.active { color: var(--azul-real); border-bottom-color: var(--oro); }
-.word-tag-popover-content { font-size: 0.88rem; line-height: 1.6; max-height: 260px; overflow-y: auto; }
-.word-tag-popover-content .wt-label { font-family: 'Cinzel', serif; font-size: 0.7rem; color: var(--oro); font-weight: bold; text-transform: uppercase; margin: 10px 0 4px; }
-.word-tag-popover-content .wt-label:first-child { margin-top: 0; }
 
 /* ==========================================================================
    RESPONSIVIDAD Y TRANSICIONES DE PANTALLA

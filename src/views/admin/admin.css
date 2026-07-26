@@ -266,58 +266,57 @@
 .word-toolbar button { background: none; border: none; padding: 8px 10px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; color: #556; display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .word-toolbar button:hover { background: #f4f6fb; color: var(--azul-real); }
 
-.color-swatch-row { display: flex; gap: 8px; }
+.color-swatch-row { display: flex; gap: 8px; flex-wrap: wrap; }
 .color-swatch { width: 26px; height: 26px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; padding: 0; }
 .color-swatch.selected { border-color: var(--azul-real); box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--azul-real); }
 .color-swatch-none { background: #f4f6fb; color: #9aa4b5; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; }
 
-.color-swatch-popover {
-  background: #fff; border: 1.5px solid #dde2ec; border-radius: 12px; padding: 10px;
-  box-shadow: 0 10px 28px rgba(20,30,60,0.18);
+/* Panel fijo de herramientas de anotación (reemplaza la barra flotante tipo tooltip) */
+.tools-panel { margin-top: 10px; border: 1.5px solid #dde2ec; border-radius: 10px; padding: 14px; background: #fafbfd; }
+.tools-panel-title { font-family: 'Cinzel', serif; font-size: 0.75rem; font-weight: bold; letter-spacing: 0.5px; color: var(--azul-real); margin-bottom: 12px; }
+.tools-panel-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.tools-panel-tile-wrap { position: relative; }
+.tools-panel-tile {
+  width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px;
+  border: 1.5px solid #e3e7f0; border-radius: 10px; background: #fff; padding: 12px 6px;
+  cursor: pointer; font-size: 0.7rem; color: #556; transition: var(--transicion, all 0.15s ease);
 }
+.tools-panel-tile i { font-size: 1.05rem; }
+.tools-panel-tile:hover { border-color: var(--oro); box-shadow: 0 4px 12px rgba(20,30,60,0.08); }
+.tools-panel-tile.is-inactive { opacity: 0.4; cursor: not-allowed; }
+.tools-panel-tile.is-inactive:hover { border-color: #e3e7f0; box-shadow: none; }
+.tools-panel-color-popover { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); z-index: 30; margin-top: 6px; }
 
-/* Herramientas de anotación de versículo: leyenda, barra flotante, tarjeta anclada */
-.annotation-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 0.72rem; color: #8894a8; }
-.annotation-legend span { display: inline-flex; align-items: center; gap: 5px; }
+/* Selector de color profesional (matiz + saturación/brillo + hex + swatches rápidos) */
+.color-picker {
+  width: 220px; background: #fff; border: 1.5px solid #dde2ec; border-radius: 12px; padding: 12px;
+  box-shadow: 0 10px 28px rgba(20,30,60,0.18); display: flex; flex-direction: column; gap: 10px;
+}
+.color-picker-sat-square { position: relative; width: 100%; aspect-ratio: 1.6; border-radius: 8px; cursor: crosshair; touch-action: none; }
+.color-picker-sat-overlay-white { position: absolute; inset: 0; background: linear-gradient(to right, #fff, transparent); border-radius: 8px; }
+.color-picker-sat-overlay-black { position: absolute; inset: 0; background: linear-gradient(to top, #000, transparent); border-radius: 8px; }
+.color-picker-sat-thumb {
+  position: absolute; width: 14px; height: 14px; border-radius: 50%; border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.3); transform: translate(-50%, -50%); pointer-events: none;
+}
+.color-picker-hue-slider {
+  width: 100%; height: 12px; border-radius: 6px; appearance: none; cursor: pointer;
+  background: linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
+}
+.color-picker-hue-slider::-webkit-slider-thumb { appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #fff; border: 2px solid #556; }
+.color-picker-hue-slider::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: #fff; border: 2px solid #556; }
+.color-picker-hex-row { display: flex; align-items: center; gap: 8px; }
+.color-picker-hex-preview { width: 26px; height: 26px; border-radius: 6px; border: 1.5px solid #dde2ec; flex-shrink: 0; }
+.color-picker-hex-input { flex: 1; border: 1.5px solid #dde2ec; border-radius: 6px; padding: 6px 8px; font-size: 0.82rem; }
+.color-picker-hex-input:focus { outline: none; border-color: var(--oro); }
 
-.selection-toolbar {
-  position: fixed;
-  z-index: 2500;
-  display: flex;
-  gap: 2px;
-  background: var(--azul-real);
-  border-radius: 10px;
-  padding: 6px;
-  box-shadow: 0 10px 28px rgba(0,0,0,0.28);
-  animation: scaleUp 0.12s ease;
-}
-.selection-toolbar-btn {
-  width: 34px; height: 34px; border-radius: 7px; border: none; background: transparent;
-  cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.92rem;
-}
-.selection-toolbar-btn:hover { background: rgba(255,255,255,0.12); }
-
-.annotation-card {
-  position: fixed;
-  z-index: 2600;
-  width: 320px;
-  max-width: calc(100vw - 20px);
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 14px 34px rgba(20,30,60,0.22);
-  border: 1px solid #eceff5;
-  overflow: hidden;
-  animation: scaleUp 0.15s ease;
-}
-.annotation-card-header {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 10px 14px; border-left: 5px solid var(--oro); background: #fafbfd; border-bottom: 1px solid #eef0f5;
-}
-.annotation-card-header-title { font-family: 'Cinzel', serif; font-size: 0.72rem; font-weight: bold; letter-spacing: 0.5px; color: var(--azul-real); display: flex; align-items: center; gap: 8px; }
-.annotation-card-header-actions { display: flex; gap: 2px; }
-.annotation-card-header-actions button { background: none; border: none; color: #9aa4b5; cursor: pointer; padding: 6px; border-radius: 6px; font-size: 0.8rem; }
-.annotation-card-header-actions button:hover { background: #eef0f5; color: var(--azul-real); }
-.annotation-card-body { padding: 14px; font-size: 0.85rem; line-height: 1.6; max-height: 360px; overflow-y: auto; }
+/* Editor de filas para referencias cruzadas (categoría + referencia libre) */
+.annotation-link-rows { display: flex; flex-direction: column; gap: 8px; }
+.annotation-link-row { display: flex; gap: 6px; align-items: center; }
+.annotation-link-row .admin-select { flex: 0 0 130px; }
+.annotation-link-row .admin-input { flex: 1; }
+.annotation-link-row-remove { background: none; border: none; color: #9aa4b5; cursor: pointer; padding: 6px; border-radius: 6px; }
+.annotation-link-row-remove:hover { background: #eef0f5; color: #e74c3c; }
 
 .admin-empty-state { text-align: center; padding: 60px 20px; color: #9aa4b5; }
 .admin-empty-state i { font-size: 2.2rem; margin-bottom: 14px; color: #d5dae5; }

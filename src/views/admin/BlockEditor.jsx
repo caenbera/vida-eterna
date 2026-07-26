@@ -3,12 +3,16 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { loadStudy, saveStudy } from '../../services/studiesService';
 import { BLOCK_TYPES } from '../../lib/blocks';
 import { ANNOTATION_KINDS, applyAnnotationStyle } from '../../lib/annotationKinds';
+import { placeCards } from '../../lib/annotationLayout';
 import { AdminBreadcrumbs } from './AdminLayout';
 import RichTextToolbar from '../../components/admin/RichTextToolbar';
-import SelectionToolbar from '../../components/admin/SelectionToolbar';
+import ToolsPanel from '../../components/admin/ToolsPanel';
 import AnnotationCard from '../../components/admin/AnnotationCard';
+import ConnectorOverlay from '../../components/annotations/ConnectorOverlay';
 
 const TRANSLATIONS = ['RVR60', 'RVR95', 'NVI', 'LBLA', 'NTV'];
+const CARD_WIDTH = 320;
+const CARD_HEIGHT_ESTIMATE = 220;
 
 const BlockEditor = () => {
   const { id, blockId } = useParams();
@@ -24,6 +28,7 @@ const BlockEditor = () => {
   const [cards, setCards] = useState([]);
   const textRef = useRef(null);
   const pendingRangeRef = useRef(null);
+  const cardElsRef = useRef({});
 
   useEffect(() => {
     (async () => {
@@ -41,7 +46,7 @@ const BlockEditor = () => {
 
   useEffect(() => {
     const handleOutsideClick = (e) => {
-      if (e.target.closest('.selection-toolbar') || e.target.closest('.color-swatch-popover')) return;
+      if (e.target.closest('.tools-panel')) return;
       if (textRef.current && textRef.current.contains(e.target)) return;
       setSelectionRect(null);
     };
@@ -155,8 +160,11 @@ const BlockEditor = () => {
         if (fields[k]) span.dataset[k] = fields[k];
         else delete span.dataset[k];
       });
+      // "links" reemplaza al viejo "refs": limpia el atributo legado tras guardar en el formato nuevo.
+      if ('links' in fields) delete span.dataset.refs;
       syncTextFromDom();
     }
+    delete cardElsRef.current[cardId];
     setCards((prev) => prev.filter((c) => c.cardId !== cardId));
   };
 
@@ -167,6 +175,7 @@ const BlockEditor = () => {
       textRef.current.normalize();
       syncTextFromDom();
     }
+    delete cardElsRef.current[cardId];
     setCards((prev) => prev.filter((c) => c.cardId !== cardId));
   };
 
@@ -175,8 +184,18 @@ const BlockEditor = () => {
       handleDeleteCard(cardId);
       return;
     }
+    delete cardElsRef.current[cardId];
     setCards((prev) => prev.filter((c) => c.cardId !== cardId));
   };
+
+  const cardPositions = placeCards(
+    cards
+      .map((card) => {
+        const span = textRef.current?.querySelector(`#${card.cardId}`);
+        return span ? { id: card.cardId, anchorRect: span.getBoundingClientRect(), width: CARD_WIDTH, height: CARD_HEIGHT_ESTIMATE } : null;
+      })
+      .filter(Boolean)
+  );
 
   return (
     <div>
@@ -232,14 +251,6 @@ const BlockEditor = () => {
 
               <div className="form-group">
                 <label>Contenido del versículo</label>
-                <div className="annotation-legend">
-                  {Object.values(ANNOTATION_KINDS).map((k) => (
-                    <span key={k.id} title={k.label}><i className={`fa-solid ${k.icon}`} style={{ color: k.color }}></i> {k.label}</span>
-                  ))}
-                </div>
-                <div style={{ fontSize: '0.75rem', color: '#9aa4b5', margin: '4px 0 8px' }}>
-                  Selecciona una palabra o frase del texto para ver las herramientas de anotación.
-                </div>
                 <div style={{ position: 'relative' }}>
                   <RichTextToolbar targetRef={textRef} onChanged={(html) => patchBlock({ text: html })} />
                   <div
@@ -253,10 +264,8 @@ const BlockEditor = () => {
                     onKeyUp={handleEditableSelect}
                     onClick={handleEditableClick}
                   />
-                  {selectionRect && (
-                    <SelectionToolbar rect={selectionRect} onPickInstant={handlePickInstant} onPickForm={handlePickForm} />
-                  )}
                 </div>
+                <ToolsPanel hasSelection={!!selectionRect} onPickInstant={handlePickInstant} onPickForm={handlePickForm} />
               </div>
 
               <div className="form-group">
@@ -341,16 +350,32 @@ const BlockEditor = () => {
         </div>
       </div>
 
-      {cards.map((card) => (
-        <AnnotationCard
-          key={card.cardId}
-          card={card}
-          onSave={handleSaveCard}
-          onDelete={handleDeleteCard}
-          onClose={handleCloseCard}
-          onStartEdit={handleStartEdit}
-        />
-      ))}
+      {cards.map((card) => {
+        const pos = cardPositions.get(card.cardId);
+        if (!pos) return null;
+        return (
+          <AnnotationCard
+            key={card.cardId}
+            ref={(el) => { if (el) cardElsRef.current[card.cardId] = el; }}
+            card={card}
+            kind={ANNOTATION_KINDS[card.kindId]}
+            onSave={handleSaveCard}
+            onDelete={handleDeleteCard}
+            onClose={handleCloseCard}
+            onStartEdit={handleStartEdit}
+            style={{ position: 'fixed', top: pos.top, left: pos.left, width: CARD_WIDTH }}
+          />
+        );
+      })}
+
+      <ConnectorOverlay
+        cards={cards.map((card) => ({
+          id: card.cardId,
+          sourceEl: textRef.current?.querySelector(`#${card.cardId}`),
+          cardEl: cardElsRef.current[card.cardId],
+          color: (ANNOTATION_KINDS[card.kindId] || {}).color || '#0a192f',
+        }))}
+      />
     </div>
   );
 };

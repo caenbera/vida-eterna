@@ -1,8 +1,9 @@
 // Herramientas de anotación de palabras/frases dentro de un bloque de versículo.
-// "Color" se fusiona dentro de Resaltar/Subrayar/Encerrar (eligen color con el mismo picker).
 // "Diccionario" se fusiona como un campo opcional dentro de Palabra clave / Léxico.
-// "Conectar" y "Comparar" quedan fuera de alcance por ahora: requieren relacionar dos
-// anotaciones entre sí o datos de múltiples traducciones, que no tenemos todavía.
+// "Conectar" se fusiona dentro de "Referencia cruzada" (referencia): en vez de un
+// textarea libre, guarda filas { category, reference } con categorías tipo
+// Paralelo/Contexto/Profecía. "Comparar" queda fuera de alcance por ahora: requiere
+// datos de múltiples traducciones, que no tenemos todavía.
 
 export const ANNOTATION_COLORS = [
   { id: 'amarillo', hex: '#f1c40f' },
@@ -13,12 +14,15 @@ export const ANNOTATION_COLORS = [
   { id: 'azul', hex: '#3498db' },
 ];
 
+export const LINK_CATEGORIES = ['Paralelo', 'Contexto', 'Profecía', 'Cumplimiento', 'Contraste'];
+
 export const ANNOTATION_KINDS = {
   resaltar: { id: 'resaltar', label: 'Resaltar', icon: 'fa-highlighter', color: '#f1c40f', instant: true },
   subrayar: { id: 'subrayar', label: 'Subrayar', icon: 'fa-pen-nib', color: '#9b59b6', instant: true },
   encerrar: { id: 'encerrar', label: 'Encerrar', icon: 'fa-vector-square', color: '#e74c3c', instant: true },
+  color: { id: 'color', label: 'Color', icon: 'fa-palette', color: '#e91e63', instant: true },
   nota: { id: 'nota', label: 'Nota de interpretación', icon: 'fa-note-sticky', color: '#f97316', fields: ['note'] },
-  referencia: { id: 'referencia', label: 'Referencia cruzada', icon: 'fa-link', color: '#3b82f6', fields: ['refs'] },
+  referencia: { id: 'referencia', label: 'Referencias cruzadas', icon: 'fa-link', color: '#3b82f6', fields: ['links'], listFields: ['links'] },
   etiqueta: { id: 'etiqueta', label: 'Etiqueta', icon: 'fa-tag', color: '#22c55e', fields: ['tag'] },
   lexico: { id: 'lexico', label: 'Palabra clave / Léxico', icon: 'fa-language', color: '#0a192f', fields: ['hebrew', 'translit', 'strong', 'meaning', 'other', 'dicturl'] },
   pregunta: { id: 'pregunta', label: 'Pregunta', icon: 'fa-circle-question', color: '#c026d3', fields: ['question'] },
@@ -38,6 +42,7 @@ export function applyAnnotationStyle(span, kindId, color) {
   span.style.border = '';
   span.style.borderRadius = '';
   span.style.padding = '';
+  span.style.color = '';
 
   if (!color) return;
 
@@ -54,12 +59,14 @@ export function applyAnnotationStyle(span, kindId, color) {
     span.style.border = `2px solid ${color}`;
     span.style.borderRadius = '4px';
     span.style.padding = '0 4px';
+  } else if (kindId === 'color') {
+    span.style.color = color;
   }
 }
 
 export const FIELD_LABELS = {
   note: 'Nota de interpretación',
-  refs: 'Referencias relacionadas (una por línea)',
+  links: 'Referencias relacionadas',
   tag: 'Texto de la etiqueta',
   hebrew: 'Hebreo / Griego',
   translit: 'Transliteración',

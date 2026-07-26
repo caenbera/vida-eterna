@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import ColorSwatchPicker from './ColorSwatchPicker';
+import ColorPicker from '../annotations/ColorPicker';
 
 // Barra de formato simple basada en document.execCommand, aplicada sobre un contentEditable.
 // onMouseDown={preventDefault} en cada botón evita que el navegador pierda la selección
@@ -39,7 +39,7 @@ const RichTextToolbar = ({ targetRef, onChanged }) => {
         </button>
         {showColor && (
           <div style={{ position: 'absolute', top: '110%', left: 0, zIndex: 20 }}>
-            <ColorSwatchPicker onPick={pickColor} />
+            <ColorPicker onPick={pickColor} />
           </div>
         )}
       </div>
