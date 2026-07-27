@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { loadStudy, saveStudy } from '../../services/studiesService';
-import { createBlock, createSection, createSubtopic, BLOCK_TYPE_LIST, BLOCK_TYPES, sanitizeStudy } from '../../lib/blocks';
+import { createBlock, createSection, createSubtopic, BLOCK_TYPE_LIST, BLOCK_TYPES, sanitizeStudy, ICON_OPTIONS, COVER_IMAGE_RECOMMENDATION } from '../../lib/blocks';
 import { AdminBreadcrumbs } from './AdminLayout';
 
 const blockPreviewText = (block) => {
@@ -25,6 +25,8 @@ const StudyConstructor = () => {
   const [selectedBlockId, setSelectedBlockId] = useState(null);
   const [showPalette, setShowPalette] = useState(false);
   const [savedAt, setSavedAt] = useState(null);
+  const [showCoverSettings, setShowCoverSettings] = useState(false);
+  const [showIconPicker, setShowIconPicker] = useState(false);
   const dragIndex = useRef(null);
 
   useEffect(() => {
@@ -45,6 +47,8 @@ const StudyConstructor = () => {
     await saveStudy(updated);
     setSavedAt(Date.now());
   };
+
+  const handleUpdateCover = (patch) => persist({ ...study, ...patch });
 
   if (loading || !study) {
     return <div style={{ textAlign: 'center', padding: '60px', color: '#9aa4b5' }}><i className="fa-solid fa-spinner fa-spin"></i> Cargando constructor...</div>;
@@ -182,6 +186,9 @@ const StudyConstructor = () => {
           <div className="admin-page-subtitle">Edita y organiza el contenido de tu estudio por bloques.</div>
         </div>
         <div style={{ display: 'flex', gap: '10px' }}>
+          <button className="btn-outline" onClick={() => setShowCoverSettings((v) => !v)}>
+            <i className="fa-regular fa-image"></i> Portada del estudio
+          </button>
           <button className="btn-outline" onClick={() => window.open(`/study/${study.id}`, '_blank')}>
             <i className="fa-regular fa-eye"></i> Vista previa
           </button>
@@ -193,6 +200,60 @@ const StudyConstructor = () => {
           </button>
         </div>
       </div>
+
+      {showCoverSettings && (
+        <div className="admin-card" style={{ marginBottom: '20px' }}>
+          <div className="admin-card-title"><i className="fa-regular fa-image"></i> Portada del estudio</div>
+          <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+            <div style={{ width: '90px', height: '120px', borderRadius: '10px', background: '#fff6e6', border: '1px solid #eadfc0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--oro)', fontSize: '1.8rem', overflow: 'hidden', flexShrink: 0 }}>
+              {study.coverImage ? (
+                <img src={study.coverImage} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <i className={`fa-solid ${study.icon || 'fa-book'}`}></i>
+              )}
+            </div>
+            <div style={{ flex: 1, minWidth: '260px' }}>
+              <div className="form-group">
+                <label>Ícono (se usa si no hay imagen de portada)</label>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                  <button type="button" className="btn-outline" onClick={() => setShowIconPicker((v) => !v)}>
+                    <i className="fa-solid fa-shapes"></i> Elegir ícono
+                  </button>
+                </div>
+                {showIconPicker && (
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '10px', flexWrap: 'wrap' }}>
+                    {ICON_OPTIONS.map((opt) => (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => { handleUpdateCover({ icon: opt }); setShowIconPicker(false); }}
+                        style={{
+                          width: '38px', height: '38px', borderRadius: '8px', border: opt === study.icon ? '2px solid var(--oro)' : '1.5px solid #dde2ec',
+                          background: '#fff', cursor: 'pointer', color: 'var(--azul-real)',
+                        }}
+                      >
+                        <i className={`fa-solid ${opt}`}></i>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="form-group">
+                <label>Imagen de portada (enlace, opcional)</label>
+                <input
+                  className="admin-input"
+                  defaultValue={study.coverImage || ''}
+                  onBlur={(e) => handleUpdateCover({ coverImage: e.target.value })}
+                  placeholder="https://ejemplo.com/mi-imagen.jpg"
+                />
+                <div style={{ fontSize: '0.72rem', color: '#9aa4b5', marginTop: '4px' }}>
+                  Tamaño recomendado: {COVER_IMAGE_RECOMMENDATION}. Si la dejas vacía, se usa el ícono.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="constructor-grid">
         {/* Árbol de estructura */}

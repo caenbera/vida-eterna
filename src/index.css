@@ -1310,7 +1310,9 @@ footer p {
   width: 100%; aspect-ratio: 3/4; border-radius: 12px;
   background: rgba(197,160,89,0.12); border: 1px solid rgba(197,160,89,0.4);
   display: flex; align-items: center; justify-content: center; font-size: 4rem; color: var(--oro);
+  overflow: hidden;
 }
+.cover-hero-icon img { width: 100%; height: 100%; object-fit: cover; }
 .cover-hero-category { color: var(--oro); font-family: 'Cinzel', serif; font-size: 0.8rem; letter-spacing: 1px; margin-bottom: 10px; }
 .cover-hero h1 { font-family: 'Playfair Display', serif; font-size: 2.4rem; margin-bottom: 8px; }
 .cover-hero .cover-subtitle { font-family: 'Playfair Display', serif; font-style: italic; color: var(--oro); font-size: 1.15rem; margin-bottom: 16px; }
@@ -1349,7 +1351,8 @@ footer p {
   max-width: 1100px; margin: 24px auto; background: #fff; border-radius: 14px; padding: 26px 32px;
   box-shadow: 0 4px 15px var(--sombra); display: flex; gap: 22px; align-items: center; flex-wrap: wrap;
 }
-.outline-header-icon { width: 66px; height: 66px; border-radius: 12px; background: var(--azul-real); color: var(--oro); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0; }
+.outline-header-icon { width: 66px; height: 66px; border-radius: 12px; background: var(--azul-real); color: var(--oro); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0; overflow: hidden; }
+.outline-header-icon img { width: 100%; height: 100%; object-fit: cover; }
 .outline-list { max-width: 1100px; margin: 0 auto 50px; }
 .outline-section { background: #fff; border-radius: 12px; margin-bottom: 16px; overflow: hidden; box-shadow: 0 3px 12px var(--sombra); }
 .outline-section-header {

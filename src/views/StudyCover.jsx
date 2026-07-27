@@ -49,7 +49,11 @@ const StudyCover = () => {
 
       <div className="cover-hero">
         <div className="cover-hero-icon">
-          <i className={`fa-solid ${study.icon || 'fa-book'}`}></i>
+          {study.coverImage ? (
+            <img src={study.coverImage} alt={study.title} />
+          ) : (
+            <i className={`fa-solid ${study.icon || 'fa-book'}`}></i>
+          )}
         </div>
         <div>
           <div className="cover-hero-category"><i className={`fa-solid ${study.icon || 'fa-book'}`}></i> {getCategoryName(study.category)}</div>

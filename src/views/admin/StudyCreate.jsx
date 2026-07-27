@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { saveStudy, loadTemplate } from '../../services/studiesService';
-import { createStudy, createSection, createSubtopic, createBlock } from '../../lib/blocks';
+import { createStudy, createSection, createSubtopic, createBlock, ICON_OPTIONS, COVER_IMAGE_RECOMMENDATION } from '../../lib/blocks';
 import { CATEGORIES } from '../../lib/categories';
 import { AdminBreadcrumbs } from './AdminLayout';
-
-const ICON_OPTIONS = ['fa-book', 'fa-crown', 'fa-cross', 'fa-scroll', 'fa-dove', 'fa-star', 'fa-infinity', 'fa-balance-scale'];
 
 const StudyCreate = () => {
   const navigate = useNavigate();
@@ -17,6 +15,7 @@ const StudyCreate = () => {
   const [category, setCategory] = useState(searchParams.get('categoria') || CATEGORIES[0].id);
   const [description, setDescription] = useState('');
   const [icon, setIcon] = useState('fa-book');
+  const [coverImage, setCoverImage] = useState('');
   const [status, setStatus] = useState('borrador');
   const [showIconPicker, setShowIconPicker] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -49,6 +48,7 @@ const StudyCreate = () => {
       category,
       description,
       icon,
+      coverImage,
       status,
       templateId: template?.id || null,
       sections,
@@ -134,6 +134,19 @@ const StudyCreate = () => {
           </div>
 
           <div className="form-group">
+            <label>Imagen de portada (enlace, opcional)</label>
+            <input
+              className="admin-input"
+              value={coverImage}
+              onChange={(e) => setCoverImage(e.target.value)}
+              placeholder="https://ejemplo.com/mi-imagen.jpg"
+            />
+            <div style={{ fontSize: '0.72rem', color: '#9aa4b5', marginTop: '4px' }}>
+              Tamaño recomendado: {COVER_IMAGE_RECOMMENDATION}. Si la dejas vacía, se usa el ícono de arriba.
+            </div>
+          </div>
+
+          <div className="form-group">
             <label>Estado del estudio *</label>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
               {[
@@ -168,8 +181,12 @@ const StudyCreate = () => {
           <div className="admin-card" style={{ marginBottom: '18px' }}>
             <div className="admin-card-title"><i className="fa-regular fa-eye"></i> Vista previa</div>
             <div style={{ background: '#fff8e6', borderRadius: '10px', padding: '22px', textAlign: 'center' }}>
-              <div style={{ width: '56px', height: '56px', margin: '0 auto 14px', borderRadius: '10px', background: '#fdefc7', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--oro)', fontSize: '1.4rem' }}>
-                <i className={`fa-solid ${icon}`}></i>
+              <div style={{ width: '56px', height: '56px', margin: '0 auto 14px', borderRadius: '10px', background: '#fdefc7', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--oro)', fontSize: '1.4rem', overflow: 'hidden' }}>
+                {coverImage ? (
+                  <img src={coverImage} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <i className={`fa-solid ${icon}`}></i>
+                )}
               </div>
               <div style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.3rem', color: 'var(--azul-real)', fontWeight: 'bold' }}>
                 {title || 'Título del estudio'}

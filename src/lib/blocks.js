@@ -3,6 +3,12 @@
 
 export const TRANSLATIONS = ['RVR60', 'RVR95', 'NVI', 'LBLA', 'NTV'];
 
+export const ICON_OPTIONS = ['fa-book', 'fa-crown', 'fa-cross', 'fa-scroll', 'fa-dove', 'fa-star', 'fa-infinity', 'fa-balance-scale'];
+
+// Tamaño recomendado para la imagen de portada: coincide con la proporción 3:4
+// de la caja donde se muestra (StudyCover.jsx), para que no se vea recortada o pixelada.
+export const COVER_IMAGE_RECOMMENDATION = '600 × 800 px (proporción 3:4)';
+
 let idCounter = 0;
 export function generateId(prefix = 'id') {
   idCounter += 1;

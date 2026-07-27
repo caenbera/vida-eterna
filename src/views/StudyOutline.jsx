@@ -56,7 +56,9 @@ const StudyOutline = () => {
       />
 
       <div className="outline-header-card">
-        <div className="outline-header-icon"><i className={`fa-solid ${study.icon || 'fa-book'}`}></i></div>
+        <div className="outline-header-icon">
+          {study.coverImage ? <img src={study.coverImage} alt={study.title} /> : <i className={`fa-solid ${study.icon || 'fa-book'}`}></i>}
+        </div>
         <div style={{ flex: 1 }}>
           <div style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.6rem', color: 'var(--azul-real)', fontWeight: 'bold' }}>{study.title}</div>
           <div style={{ color: '#8894a8' }}>{study.subtitle}</div>
