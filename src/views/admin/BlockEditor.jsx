@@ -5,7 +5,7 @@ import { BLOCK_TYPES, TRANSLATIONS, sanitizeStudy } from '../../lib/blocks';
 import { ANNOTATION_KINDS, applyAnnotationStyle } from '../../lib/annotationKinds';
 import { placeCards } from '../../lib/annotationLayout';
 import { AdminBreadcrumbs } from './AdminLayout';
-import RichTextToolbar from '../../components/admin/RichTextToolbar';
+import RichEditableField from '../../components/admin/RichEditableField';
 import ToolsPanel from '../../components/admin/ToolsPanel';
 import AnnotationCard from '../../components/admin/AnnotationCard';
 import ConnectorOverlay from '../../components/annotations/ConnectorOverlay';
@@ -250,23 +250,15 @@ const BlockEditor = () => {
 
               <div className="form-group">
                 <label>Contenido del versículo</label>
-                <div style={{ position: 'relative' }}>
-                  <RichTextToolbar targetRef={textRef} onChanged={(html) => patchBlock({ text: html })} />
-                  <div
-                    ref={textRef}
-                    className="rich-editable"
-                    contentEditable
-                    suppressContentEditableWarning
-                    data-gramm="false"
-                    data-gramm_editor="false"
-                    data-enable-grammarly="false"
-                    dangerouslySetInnerHTML={{ __html: block.text || '' }}
-                    onBlur={(e) => { patchBlock({ text: e.currentTarget.innerHTML }); }}
-                    onMouseUp={handleEditableSelect}
-                    onKeyUp={handleEditableSelect}
-                    onClick={handleEditableClick}
-                  />
-                </div>
+                <RichEditableField
+                  ref={textRef}
+                  html={block.text}
+                  onToolbarChange={(html) => patchBlock({ text: html })}
+                  onBlur={(e) => { patchBlock({ text: e.currentTarget.innerHTML }); }}
+                  onMouseUp={handleEditableSelect}
+                  onKeyUp={handleEditableSelect}
+                  onClick={handleEditableClick}
+                />
                 <ToolsPanel hasSelection={!!selectionRect} onPickInstant={handlePickInstant} onPickForm={handlePickForm} />
               </div>
 
@@ -280,16 +272,10 @@ const BlockEditor = () => {
           {'content' in block && block.type !== 'versiculo' && (
             <div className="form-group">
               <label>Contenido</label>
-              <RichTextToolbar targetRef={textRef} onChanged={(html) => patchBlock({ content: html })} />
-              <div
+              <RichEditableField
                 ref={textRef}
-                className="rich-editable"
-                contentEditable
-                suppressContentEditableWarning
-                data-gramm="false"
-                data-gramm_editor="false"
-                data-enable-grammarly="false"
-                dangerouslySetInnerHTML={{ __html: block.content || '' }}
+                html={block.content}
+                onToolbarChange={(html) => patchBlock({ content: html })}
                 onBlur={(e) => patchBlock({ content: e.currentTarget.innerHTML })}
               />
             </div>
