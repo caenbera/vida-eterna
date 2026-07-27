@@ -12,5 +12,13 @@ service cloud.firestore {
     match /templates/{templateId} {
       allow read, write: if request.auth != null;
     }
+
+    // Tokens de integraciones de servidor (ej. OAuth de EGW Writings).
+    // Solo el SDK admin (funciones serverless) puede tocar esto — se
+    // salta estas reglas, así que ningún cliente (ni el admin autenticado)
+    // debe poder leer/escribir aquí directamente.
+    match /_serverTokens/{docId} {
+      allow read, write: if false;
+    }
   }
 }

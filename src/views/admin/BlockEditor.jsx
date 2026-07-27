@@ -9,6 +9,7 @@ import RichEditableField from '../../components/admin/RichEditableField';
 import ToolsPanel from '../../components/admin/ToolsPanel';
 import AnnotationCard from '../../components/admin/AnnotationCard';
 import ConnectorOverlay from '../../components/annotations/ConnectorOverlay';
+import { searchEgw, fetchEgwParagraph } from '../../lib/egwWritings';
 
 const CARD_WIDTH = 320;
 const CARD_HEIGHT_ESTIMATE = 220;
@@ -26,9 +27,24 @@ const BlockEditor = () => {
   const [loading, setLoading] = useState(true);
   const [selectionRect, setSelectionRect] = useState(null);
   const [cards, setCards] = useState([]);
+  const [egwQuery, setEgwQuery] = useState('');
+  const [egwResults, setEgwResults] = useState([]);
+  const [egwSearching, setEgwSearching] = useState(false);
   const textRef = useRef(null);
   const pendingRangeRef = useRef(null);
   const cardElsRef = useRef({});
+
+  useEffect(() => {
+    const q = egwQuery.trim();
+    if (q.length < 3) { setEgwResults([]); return; }
+    let cancelled = false;
+    setEgwSearching(true);
+    const timer = setTimeout(async () => {
+      const results = await searchEgw(q);
+      if (!cancelled) { setEgwResults(results); setEgwSearching(false); }
+    }, 350);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [egwQuery]);
 
   useEffect(() => {
     (async () => {
@@ -79,6 +95,14 @@ const BlockEditor = () => {
   };
 
   const syncTextFromDom = () => patchBlock({ text: textRef.current.innerHTML });
+
+  const applyEgwResult = async (result) => {
+    const data = await fetchEgwParagraph(result.bookId, result.para);
+    if (!data) return;
+    patchBlock(data);
+    setEgwQuery('');
+    setEgwResults([]);
+  };
 
   // ---- Selección de texto dentro del versículo -> barra flotante ----
   const handleEditableSelect = () => {
@@ -253,6 +277,30 @@ const BlockEditor = () => {
 
               {block.type === 'cita' && (
                 <>
+                  <div className="form-group annotation-lexicon-search" style={{ marginBottom: '4px' }}>
+                    <label>Buscar en EGW Writings</label>
+                    <input
+                      className="admin-input"
+                      value={egwQuery}
+                      onChange={(e) => setEgwQuery(e.target.value)}
+                      placeholder="Ej. only-begotten Son, righteousness by faith..."
+                    />
+                    {egwSearching && <div style={{ fontSize: '0.75rem', color: '#9aa4b5', marginTop: '4px' }}><i className="fa-solid fa-spinner fa-spin"></i> Buscando...</div>}
+                    {egwResults.length > 0 && (
+                      <ul className="annotation-lexicon-results">
+                        {egwResults.map((r, i) => (
+                          <li key={`${r.bookId}.${r.para}_${i}`}>
+                            <button type="button" onClick={() => applyEgwResult(r)}>
+                              <strong>{r.title}</strong>
+                              <span className="annotation-lexicon-strong">{r.refcode}</span>
+                              <span className="annotation-lexicon-meaning">{r.snippet}</span>
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
                     <div className="form-group">
                       <label>Autor</label>
