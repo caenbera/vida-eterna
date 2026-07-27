@@ -6,6 +6,10 @@ export default function handler(req, res) {
     response_type: 'code',
     client_id: process.env.EGW_CLIENT_ID,
     redirect_uri: process.env.EGW_REDIRECT_URI,
+    // El servidor de EGW Writings usa OpenIddict: sin pedir explícitamente
+    // el scope "offline_access", no emite refresh_token (confirmado: la
+    // respuesta de token solo traía access_token/token_type/expires_in).
+    scope: 'offline_access',
   });
   res.writeHead(302, { Location: `https://cpanel.egwwritings.org/o/authorize/?${params}` });
   res.end();
