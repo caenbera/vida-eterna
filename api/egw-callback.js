@@ -15,11 +15,15 @@ export default async function handler(req, res) {
     return;
   }
   try {
-    await handleAuthCallback(code);
+    const tokens = await handleAuthCallback(code);
+    const warning = tokens.refresh_token
+      ? ''
+      : '<p style="color:#a5710e">Nota: EGW Writings no devolvió un refresh token en esta respuesta — cuando el token de acceso expire, habrá que volver a visitar /api/egw-authorize.</p>';
     res.status(200).send(
       '<html><body style="font-family:sans-serif;text-align:center;padding:60px">' +
       '<h1>Conectado correctamente</h1>' +
       '<p>Ya puedes cerrar esta pestaña y volver al editor de estudios.</p>' +
+      warning +
       '</body></html>'
     );
   } catch (err) {

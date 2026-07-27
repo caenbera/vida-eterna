@@ -26,12 +26,16 @@ function tokenDocRef() {
 }
 
 async function saveTokens({ access_token, refresh_token, expires_in }) {
-  await tokenDocRef().set({
+  const doc = {
     accessToken: access_token,
-    refreshToken: refresh_token,
     // Renovamos 60s antes de que expire de verdad, para no fallar por poco.
     expiresAt: Date.now() + (Number(expires_in) - 60) * 1000,
-  });
+  };
+  // Firestore rechaza "undefined" — si el proveedor no devolvió refresh_token
+  // en esta respuesta, no tocamos el campo (set con merge conserva el que ya
+  // hubiera, si es que hay uno guardado de antes).
+  if (refresh_token) doc.refreshToken = refresh_token;
+  await tokenDocRef().set(doc, { merge: true });
 }
 
 async function requestToken(params) {
@@ -57,7 +61,11 @@ export async function handleAuthCallback(code) {
     code,
     redirect_uri: process.env.EGW_REDIRECT_URI,
   });
+  // Diagnóstico temporal: solo los NOMBRES de campo (nunca los valores) para
+  // confirmar si EGW Writings realmente no manda refresh_token en este grant.
+  console.log('EGW token response fields:', Object.keys(tokens));
   await saveTokens(tokens);
+  return tokens;
 }
 
 export async function getValidAccessToken() {
@@ -68,6 +76,9 @@ export async function getValidAccessToken() {
   const data = snap.data();
   if (Date.now() < data.expiresAt) {
     return data.accessToken;
+  }
+  if (!data.refreshToken) {
+    throw new Error('El token de EGW Writings expiró y no hay refresh token guardado. Visita /api/egw-authorize para volver a autorizar.');
   }
   const refreshed = await requestToken({
     grant_type: 'refresh_token',
