@@ -6,10 +6,11 @@ import { readListField } from '../../lib/annotationData';
 // del admin (modo vista) y la tarjeta de solo lectura del sitio público, para que
 // ambas se vean idénticas y no diverjan con el tiempo.
 const AnnotationFieldsReadOnly = ({ kind, dataset }) => {
+  const fields = kind.fields || [];
   const isListField = (field) => (kind.listFields || []).includes(field);
   const legacyFieldFor = (field) => (field === 'links' ? 'refs' : undefined);
 
-  const hasAny = kind.fields.some((field) =>
+  const hasAny = fields.some((field) =>
     isListField(field)
       ? readListField(dataset, field, legacyFieldFor(field)).length > 0
       : !!dataset[field]
@@ -21,7 +22,7 @@ const AnnotationFieldsReadOnly = ({ kind, dataset }) => {
 
   return (
     <>
-      {kind.fields.map((field) => {
+      {fields.map((field) => {
         if (isListField(field)) {
           const rows = readListField(dataset, field, legacyFieldFor(field));
           if (!rows.length) return null;

@@ -9,6 +9,10 @@ export const ICON_OPTIONS = ['fa-book', 'fa-crown', 'fa-cross', 'fa-scroll', 'fa
 // de la caja donde se muestra (StudyCover.jsx), para que no se vea recortada o pixelada.
 export const COVER_IMAGE_RECOMMENDATION = '600 × 800 px (proporción 3:4)';
 
+// Solo alimenta el <datalist> del campo "Autor" en bloques de tipo "cita" —
+// el campo sigue siendo texto libre para cualquier otro autor.
+export const PIONEER_AUTHORS = ['Elena G. de White', 'Jaime White', 'J. N. Andrews', 'Uriah Smith', 'J. N. Loughborough', 'S. N. Haskell'];
+
 let idCounter = 0;
 export function generateId(prefix = 'id') {
   idCounter += 1;
@@ -71,6 +75,13 @@ export const BLOCK_TYPES = {
     icon: 'fa-minus',
     color: '#94a3b8',
     description: 'Separador visual o espacio.',
+  },
+  cita: {
+    id: 'cita',
+    label: 'Cita de escrito',
+    icon: 'fa-feather',
+    color: '#8b5e34',
+    description: 'Cita de un libro, carta o artículo (EGW, pioneros, etc.) con enlace a la fuente.',
   },
 };
 
@@ -141,6 +152,8 @@ export function createBlock(type) {
       return { id, type, title: 'Conclusión', content: '' };
     case 'separador':
       return { id, type };
+    case 'cita':
+      return { id, type, title: '', author: '', work: '', citation: '', sourceUrl: '', text: '' };
     default:
       return { id, type };
   }

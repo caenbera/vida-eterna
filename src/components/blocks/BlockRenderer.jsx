@@ -7,6 +7,7 @@ import AcordeonBlock from './AcordeonBlock';
 import PreguntaBlock from './PreguntaBlock';
 import ConclusionBlock from './ConclusionBlock';
 import SeparadorBlock from './SeparadorBlock';
+import CitaBlock from './CitaBlock';
 
 const COMPONENTS = {
   texto: TextoBlock,
@@ -17,6 +18,7 @@ const COMPONENTS = {
   pregunta: PreguntaBlock,
   conclusion: ConclusionBlock,
   separador: SeparadorBlock,
+  cita: CitaBlock,
 };
 
 // Renderiza en modo lectura una lista de bloques (usado por la página de Tema del usuario

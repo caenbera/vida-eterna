@@ -85,7 +85,7 @@ const AnnotationCard = forwardRef(({ card, kind, onSave, onDelete, onClose, onSt
               )}
             </div>
           )}
-          {kind.fields.map((field) => (
+          {(kind.fields || []).map((field) => (
             <div className="form-group" key={field} style={{ marginBottom: '10px' }}>
               <label style={{ fontSize: '0.72rem' }}>{FIELD_LABELS[field]}</label>
               {field === 'translations' ? (

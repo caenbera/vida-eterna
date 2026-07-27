@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { loadStudy, saveStudy } from '../../services/studiesService';
-import { BLOCK_TYPES, TRANSLATIONS, sanitizeStudy } from '../../lib/blocks';
+import { BLOCK_TYPES, TRANSLATIONS, PIONEER_AUTHORS, sanitizeStudy } from '../../lib/blocks';
 import { ANNOTATION_KINDS, applyAnnotationStyle } from '../../lib/annotationKinds';
 import { placeCards } from '../../lib/annotationLayout';
 import { AdminBreadcrumbs } from './AdminLayout';
@@ -12,6 +12,7 @@ import ConnectorOverlay from '../../components/annotations/ConnectorOverlay';
 
 const CARD_WIDTH = 320;
 const CARD_HEIGHT_ESTIMATE = 220;
+const ANNOTATABLE_TYPES = ['versiculo', 'cita'];
 
 const BlockEditor = () => {
   const { id, blockId } = useParams();
@@ -233,23 +234,75 @@ const BlockEditor = () => {
             </div>
           )}
 
-          {block.type === 'versiculo' && (
+          {ANNOTATABLE_TYPES.includes(block.type) && (
             <>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 160px', gap: '14px' }}>
-                <div className="form-group">
-                  <label>Referencia bíblica</label>
-                  <input className="admin-input" value={block.reference || ''} onChange={(e) => patchBlock({ reference: e.target.value })} />
+              {block.type === 'versiculo' && (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 160px', gap: '14px' }}>
+                  <div className="form-group">
+                    <label>Referencia bíblica</label>
+                    <input className="admin-input" value={block.reference || ''} onChange={(e) => patchBlock({ reference: e.target.value })} />
+                  </div>
+                  <div className="form-group">
+                    <label>Traducción</label>
+                    <select className="admin-select" value={block.translation || 'RVR60'} onChange={(e) => patchBlock({ translation: e.target.value })}>
+                      {TRANSLATIONS.map((t) => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </div>
                 </div>
-                <div className="form-group">
-                  <label>Traducción</label>
-                  <select className="admin-select" value={block.translation || 'RVR60'} onChange={(e) => patchBlock({ translation: e.target.value })}>
-                    {TRANSLATIONS.map((t) => <option key={t} value={t}>{t}</option>)}
-                  </select>
-                </div>
-              </div>
+              )}
+
+              {block.type === 'cita' && (
+                <>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                    <div className="form-group">
+                      <label>Autor</label>
+                      <input
+                        className="admin-input"
+                        list="pioneer-authors"
+                        value={block.author || ''}
+                        onChange={(e) => patchBlock({ author: e.target.value })}
+                        placeholder="Ej. Elena G. de White"
+                      />
+                      <datalist id="pioneer-authors">
+                        {PIONEER_AUTHORS.map((name) => <option key={name} value={name} />)}
+                      </datalist>
+                    </div>
+                    <div className="form-group">
+                      <label>Obra / publicación</label>
+                      <input
+                        className="admin-input"
+                        value={block.work || ''}
+                        onChange={(e) => patchBlock({ work: e.target.value })}
+                        placeholder="Ej. Signs of the Times"
+                      />
+                    </div>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '14px' }}>
+                    <div className="form-group">
+                      <label>Referencia</label>
+                      <input
+                        className="admin-input"
+                        value={block.citation || ''}
+                        onChange={(e) => patchBlock({ citation: e.target.value })}
+                        placeholder="Ej. ST May 30, 1895, par. 3"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Enlace a la fuente</label>
+                      <input
+                        className="admin-input"
+                        type="url"
+                        value={block.sourceUrl || ''}
+                        onChange={(e) => patchBlock({ sourceUrl: e.target.value })}
+                        placeholder="https://egwwritings.org/..."
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
 
               <div className="form-group">
-                <label>Contenido del versículo</label>
+                <label>{block.type === 'versiculo' ? 'Contenido del versículo' : 'Texto de la cita'}</label>
                 <RichEditableField
                   ref={textRef}
                   html={block.text}
@@ -262,14 +315,16 @@ const BlockEditor = () => {
                 <ToolsPanel hasSelection={!!selectionRect} onPickInstant={handlePickInstant} onPickForm={handlePickForm} />
               </div>
 
-              <div className="form-group">
-                <label>Contexto exegético (opcional)</label>
-                <textarea className="admin-textarea" value={block.context || ''} onChange={(e) => patchBlock({ context: e.target.value })} />
-              </div>
+              {block.type === 'versiculo' && (
+                <div className="form-group">
+                  <label>Contexto exegético (opcional)</label>
+                  <textarea className="admin-textarea" value={block.context || ''} onChange={(e) => patchBlock({ context: e.target.value })} />
+                </div>
+              )}
             </>
           )}
 
-          {'content' in block && block.type !== 'versiculo' && (
+          {'content' in block && !ANNOTATABLE_TYPES.includes(block.type) && (
             <div className="form-group">
               <label>Contenido</label>
               <RichEditableField
