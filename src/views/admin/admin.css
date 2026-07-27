@@ -342,6 +342,33 @@
 .admin-empty-state { text-align: center; padding: 60px 20px; color: #9aa4b5; }
 .admin-empty-state i { font-size: 2.2rem; margin-bottom: 14px; color: #d5dae5; }
 
+/* Manual de ayuda (/admin/ayuda) */
+.admin-help-layout { display: grid; grid-template-columns: 180px 1fr; gap: 24px; align-items: start; }
+.admin-help-toc { position: sticky; top: 20px; display: flex; flex-direction: column; gap: 4px; }
+.admin-help-toc a { color: #6b7688; text-decoration: none; font-size: 0.85rem; padding: 8px 10px; border-radius: 8px; }
+.admin-help-toc a:hover { background: #f4f6fb; color: var(--azul-real); }
+.admin-help-content { display: flex; flex-direction: column; gap: 20px; }
+.admin-help-content .admin-card { scroll-margin-top: 20px; }
+.admin-help-steps { list-style: none; padding: 0; margin: 0; counter-reset: help-step; }
+.admin-help-steps li { counter-increment: help-step; position: relative; padding: 4px 0 16px 34px; }
+.admin-help-steps li::before {
+  content: counter(help-step); position: absolute; left: 0; top: 2px;
+  width: 24px; height: 24px; border-radius: 50%; background: var(--azul-real); color: #fff;
+  display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold;
+}
+.admin-help-steps strong { color: var(--azul-real); display: block; margin-bottom: 3px; }
+.admin-help-steps p { margin: 0; color: #6b7688; font-size: 0.85rem; line-height: 1.6; }
+.admin-help-block-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-bottom: 20px; }
+.admin-help-block-item { display: flex; gap: 12px; align-items: flex-start; }
+.admin-help-block-label { font-weight: bold; color: var(--azul-real); font-size: 0.9rem; }
+.admin-help-block-desc { font-size: 0.78rem; color: #8894a8; margin: 2px 0 4px; }
+.admin-help-block-tip { font-size: 0.82rem; color: #556; line-height: 1.5; }
+.admin-help-tools-subtitle { font-family: 'Cinzel', serif; font-size: 0.78rem; letter-spacing: 0.5px; color: #9aa4b5; margin: 4px 0 12px; text-transform: uppercase; }
+@media (max-width: 800px) {
+  .admin-help-layout { grid-template-columns: 1fr; }
+  .admin-help-toc { position: static; flex-direction: row; flex-wrap: wrap; }
+}
+
 .admin-toggle { position: relative; display: inline-block; width: 40px; height: 22px; }
 .admin-toggle input { opacity: 0; width: 0; height: 0; }
 .admin-toggle-slider { position: absolute; inset: 0; background: #dde2ec; border-radius: 22px; cursor: pointer; transition: var(--transicion); }

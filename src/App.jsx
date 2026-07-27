@@ -14,6 +14,7 @@ import BlockEditor from './views/admin/BlockEditor';
 import AccordionBuilder from './views/admin/AccordionBuilder';
 import Templates from './views/admin/Templates';
 import Configuracion from './views/admin/Configuracion';
+import AdminHelp from './views/admin/AdminHelp';
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
           <Route path="estudios/:id/constructor/acordeon/:blockId" element={<AccordionBuilder />} />
           <Route path="plantillas" element={<Templates />} />
           <Route path="configuracion" element={<Configuracion />} />
+          <Route path="ayuda" element={<AdminHelp />} />
         </Route>
       </Routes>
     </Router>

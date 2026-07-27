@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { to: '/admin/estudios', icon: 'fa-book-open', label: 'Estudios' },
   { to: '/admin/plantillas', icon: 'fa-file-lines', label: 'Plantillas' },
   { to: '/admin/configuracion', icon: 'fa-gear', label: 'Configuración' },
+  { to: '/admin/ayuda', icon: 'fa-circle-question', label: 'Ayuda' },
 ];
 
 const AdminLayout = () => {
