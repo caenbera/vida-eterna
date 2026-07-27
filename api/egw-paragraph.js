@@ -17,7 +17,10 @@ export default async function handler(req, res) {
     const token = await getValidAccessToken();
     const url = `${EGW_API_BASE}/content/books/${book}/content/${para}`;
     const apiRes = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-    if (!apiRes.ok) throw new Error(`EGW API respondió ${apiRes.status}`);
+    if (!apiRes.ok) {
+      const body = await apiRes.text().catch(() => '');
+      throw new Error(`EGW API respondió ${apiRes.status}: ${body.slice(0, 300)}`);
+    }
     const data = await apiRes.json();
     const first = Array.isArray(data) ? data[0] : data;
     if (!first) {

@@ -15,7 +15,10 @@ export default async function handler(req, res) {
     const token = await getValidAccessToken();
     const url = `${EGW_API_BASE}/search/advanced/book?${new URLSearchParams({ query: q, lang: 'en', limit: '15' })}`;
     const apiRes = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-    if (!apiRes.ok) throw new Error(`EGW API respondió ${apiRes.status}`);
+    if (!apiRes.ok) {
+      const body = await apiRes.text().catch(() => '');
+      throw new Error(`EGW API respondió ${apiRes.status}: ${body.slice(0, 300)}`);
+    }
     const data = await apiRes.json();
     const results = (data.results || []).map((r) => {
       const [bookId, para] = (r.para_id || '').split('.');
